@@ -856,6 +856,12 @@ namespace EpsilWin_LA2YUA
                     return false;
                 }
 
+                if (currentmessage.Payload.Count != e.Payload_Size)
+                {
+                    // message looks like garbage data
+                    return false;
+                }
+
                 bool retval = false;
 
                 switch (e.Command_Index)

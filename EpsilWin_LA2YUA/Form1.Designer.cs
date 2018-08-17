@@ -638,6 +638,7 @@
             this.numericUpDown8.Name = "numericUpDown8";
             this.numericUpDown8.Size = new System.Drawing.Size(75, 20);
             this.numericUpDown8.TabIndex = 23;
+            this.numericUpDown8.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label27
             // 
@@ -1511,7 +1512,7 @@
             this.button25_Read_All.Name = "button25_Read_All";
             this.button25_Read_All.Size = new System.Drawing.Size(75, 23);
             this.button25_Read_All.TabIndex = 14;
-            this.button25_Read_All.Text = "Read All";
+            this.button25_Read_All.Text = "Get All";
             this.button25_Read_All.UseVisualStyleBackColor = true;
             this.button25_Read_All.Click += new System.EventHandler(this.button25_Read_All_Click);
             // 

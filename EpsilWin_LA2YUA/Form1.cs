@@ -19,7 +19,7 @@ namespace EpsilWin_LA2YUA
         {
             InitializeComponent();
 
-            string Version = "0.3";
+            string Version = "0.4";
             string Date = "2018";
 
             label1.Text = String.Format("LA2YUA Epsilon Clock Interface EC2S, version {0} - {1}", Version, Date);
@@ -259,6 +259,9 @@ namespace EpsilWin_LA2YUA
             dataGridView2_Version_Info.Rows.Add(new object[] { "DC Power",
                 version.Power_24V == EpsilonVersionMessage.PowerInputTypes.DCPower24V ? "24V DC" : "48V DC"});
 
+            dataGridView2_Version_Info.Rows.Add(new object[] { "Timing Source",
+                version.TimeSource == EpsilonVersionMessage.FrequencyInputTypes.InputTypeGPS ? "GPS" : "STANAG"});
+
             switch (version.Clock_Output_Type)
             {
                 case EpsilonVersionMessage.ClockOutputTypes.G704:
@@ -277,7 +280,7 @@ namespace EpsilWin_LA2YUA
                     statustext = "Reserved (Unknown)";
                     break;
                 case EpsilonVersionMessage.ClockOutputTypes.STANAG_4440:
-                    statustext = "STANAG 4480 (HAVEQUICK)";
+                    statustext = "STANAG 4430 (Extended Have Quick, XHQ)";
                     break;
 
             }
@@ -407,7 +410,7 @@ namespace EpsilWin_LA2YUA
                 statustext = "";
                 if (status.Antenna_Not_Connected && status.Antenna_Short_Circuit)
                 {
-                    statustext = "Not Connected AND Short Circuit (HOW!?)";
+                    statustext = "Not Connected AND Short Circuit (World is upside down, likely hardware fault)";
                 }
                 else
                 {
@@ -540,7 +543,7 @@ namespace EpsilWin_LA2YUA
                 String.Format("{0:N2} m", gpscoords.Altitude),
                 "N/A"});
 
-            // TODO: Satellite info (separate view?)
+            
 
             dataGridView1_Status_Info.Rows.Add(new object[] { "1PPS Standard Dev.",
                 String.Format("{0} ns", status.Standard_Deviation_1PPS),
@@ -1410,6 +1413,12 @@ namespace EpsilWin_LA2YUA
         // exit handler
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Close();
+            }
+
             if (comboBox1_Serial_Port.Text != String.Empty)
             {
                 Properties.Settings.Default["Selected_COM_Port"] = comboBox1_Serial_Port.Text;

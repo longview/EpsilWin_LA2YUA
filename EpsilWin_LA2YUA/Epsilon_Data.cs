@@ -666,8 +666,8 @@ namespace EpsilWin_LA2YUA
                     }
                 }
             }
-            private Int32 _ppscorrectionvalue_highlimit = 5000;
-            private Int32 _ppscorrectionvalue_lowlimit = -5000;
+            private Int32 _ppscorrectionvalue_highlimit = 50000;
+            private Int32 _ppscorrectionvalue_lowlimit = -50000;
             private Int32 _ppscorrectionvalue;
 
             public bool Serialize(out List<byte> payload)

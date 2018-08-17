@@ -19,7 +19,7 @@ namespace EpsilWin_LA2YUA
         {
             InitializeComponent();
 
-            string Version = "0.2 Beta";
+            string Version = "0.3";
             string Date = "2018";
 
             label1.Text = String.Format("LA2YUA Epsilon Clock Interface EC2S, version {0} - {1}", Version, Date);
@@ -427,9 +427,9 @@ namespace EpsilWin_LA2YUA
 
             if (epsilondevice.LastVersionMessage.Software_Version >= 2)
             {
-                dataGridView1_Status_Info.Rows.Add(new object[] { "10 MHz Lock",
-                status.Frequency_Output_Locked ? "Cycle Locked" :
-                "Not Cycle Locked",
+                dataGridView1_Status_Info.Rows.Add(new object[] { "10 MHz/1PPS Lock",
+                status.Frequency_Output_Locked ? "10 MHz/1PPS in phase" :
+                "10 MHz/1PPS phase not synced",
             status.Frequency_Output_Locked ? "OK" : "WARNING"});
             }
             else

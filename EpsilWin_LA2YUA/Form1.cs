@@ -642,7 +642,7 @@ namespace EpsilWin_LA2YUA
             if (this.richTextBox1_Serial_Log.InvokeRequired)
             {
                 SetSerialDataInputCallback d = new SetSerialDataInputCallback(serialData_input);
-                this.Invoke(d, new object[] { text });
+                this.BeginInvoke(d, new object[] { text });
                 return;
             }
 
@@ -1463,9 +1463,11 @@ namespace EpsilWin_LA2YUA
         // exit handler
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-
+            //System.Threading.Thread.Sleep(100);
             if (serialPort1.IsOpen)
             {
+                serialPort1.DiscardInBuffer();
+                serialPort1.DiscardOutBuffer();
                 serialPort1.Close();
             }
 

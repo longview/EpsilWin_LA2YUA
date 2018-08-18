@@ -1155,6 +1155,15 @@ namespace EpsilWin_LA2YUA
                 // set each item to read only to generate exceptions if any modifications are made to the dictionary content
                 foreach (KeyValuePair<int, EpsilonCommandInfo> key in _Epsilon_Command_List)
                 {
+
+                    if (key.Value.ReadWrite == EpsilonCommandAccessType.Read &&
+                        key.Value.Command_Index != EpsilonCommandsIndex.Remote_Control_Read &&
+                        key.Value.Command_Index != EpsilonCommandsIndex.Force_Holdover_Read)
+                    {
+                        key.Value.ReadRequirements.Add(EpsilonCommandsIndex.Remote_Control_Read);
+                        key.Value.ReadRequirements.Add(EpsilonCommandsIndex.Force_Holdover_Read);
+                    }
+
                     key.Value.SetReadOnly();
                 }
 

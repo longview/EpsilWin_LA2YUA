@@ -64,6 +64,20 @@ namespace EpsilWin_LA2YUA
                 throw new Exception("Command lookup returned wrong command ID. World is upside down.");
             }
 
+           // attempt to resolve read requirements to get correct parsing
+           // may just cause a stack overflow :)
+            if (e.ReadRequirements.Count > 0)
+            {
+                foreach(EpsilonCommandsIndex cmd in e.ReadRequirements)
+                {
+                    // check the epsilon device context list if we already have a valid data set for the commdn
+                    if (!epsilondevice.ValidCommands.Contains(cmd))
+                    {
+                        Epsilon_Issue_Command(cmd);
+                    }
+                }
+            }
+
             // TODO: Check if requirements to transmit are met, largely not important since the device just NACKs if there's something wrong
             /*switch (e.Write_Conditions)
             {
@@ -1238,14 +1252,14 @@ namespace EpsilWin_LA2YUA
             b.BackColor = Color.Orange;
             if (!epsilondevice.GPS_Info.DataValid)
             {
-                Epsilon_Issue_Command(EpsilonCommandsIndex.GPS_Init_Read);
-                Epsilon_Issue_Command(EpsilonCommandsIndex.Leap_Second_Read);
-                Epsilon_Issue_Command(EpsilonCommandsIndex.Phase_Correction_Read);
+                //Epsilon_Issue_Command(EpsilonCommandsIndex.GPS_Init_Read);
+                //Epsilon_Issue_Command(EpsilonCommandsIndex.Leap_Second_Read);
+                //Epsilon_Issue_Command(EpsilonCommandsIndex.Phase_Correction_Read);
             }
 
             if (!epsilondevice.LastVersionMessage.DataValid)
             {
-                Epsilon_Issue_Command(EpsilonCommandsIndex.Version_Read);
+                //Epsilon_Issue_Command(EpsilonCommandsIndex.Version_Read);
             }
 
             Epsilon_Issue_Command(EpsilonCommandsIndex.Status_Read);
@@ -1263,17 +1277,6 @@ namespace EpsilWin_LA2YUA
             if (box.Checked)
             {
                 timer1_Status_Auto.Start();
-                if (!epsilondevice.GPS_Info.DataValid)
-                {
-                    Epsilon_Issue_Command(EpsilonCommandsIndex.GPS_Init_Read);
-                    Epsilon_Issue_Command(EpsilonCommandsIndex.Leap_Second_Read);
-                    Epsilon_Issue_Command(EpsilonCommandsIndex.Phase_Correction_Read);
-                }
-
-                if (!epsilondevice.LastVersionMessage.DataValid)
-                {
-                    Epsilon_Issue_Command(EpsilonCommandsIndex.Version_Read);
-                }
                 Epsilon_Issue_Command(EpsilonCommandsIndex.Status_Read);
             }
             else

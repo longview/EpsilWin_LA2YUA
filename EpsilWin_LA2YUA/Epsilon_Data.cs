@@ -158,6 +158,12 @@ namespace EpsilWin_LA2YUA
                 c = unchecked((sbyte)currentmessage.Payload[1]);
                 Minute_Offset = c;
 
+                if (Minute_Offset > 59 || Minute_Offset < -59)
+                    DataValid = false;
+                if (Hours_Offset > 23 || Hours_Offset < -23)
+                    DataValid = false;
+
+
                 return DataValid;
             }
         };
@@ -544,6 +550,12 @@ namespace EpsilWin_LA2YUA
                 }
                 DataValid = true;
 
+                if (currentmessage.Payload[0] > 1)
+                {
+                    DataValid = false;
+                    return false;
+                }
+
                 CorrectionType = currentmessage.Payload[0] == 0 ? 
                     EpsilonManualSecondCorrectionTypes.Add_1_Second : EpsilonManualSecondCorrectionTypes.Subtract_1_Second;
 
@@ -658,6 +670,12 @@ namespace EpsilWin_LA2YUA
                 }
                 DataValid = true;
 
+                if (currentmessage.Payload[0] > 1)
+                {
+                    DataValid = false;
+                    return false;
+                }
+
                 TODSetup = currentmessage.Payload[0] == 0 ? EpsilonTimeOfDayTypes.TOD_Message_Output : EpsilonTimeOfDayTypes.TOD_Diagnostic_Output;
 
                 return DataValid;
@@ -756,11 +774,11 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                DataValid = true;
+                
 
                 _ppscorrectionvalue = (Int32)currentmessage.Payload[0] << 24 | (Int32)currentmessage.Payload[1] << 16 |
                                 (Int32)currentmessage.Payload[2] << 8 | (Int32)currentmessage.Payload[3];
-
+                DataValid = true;
                 return DataValid;
             }
 
@@ -816,11 +834,11 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                DataValid = true;
+                
 
                 _ppscorrectionvalue = (Int32)currentmessage.Payload[0] << 24 | (Int32)currentmessage.Payload[1] << 16 |
                                 (Int32)currentmessage.Payload[2] << 8 | (Int32)currentmessage.Payload[3];
-
+                DataValid = true;
                 return DataValid;
             }
 
@@ -852,11 +870,11 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                DataValid = true;
+                
 
                 Phase_Correction_Value = (UInt32)currentmessage.Payload[0] << 24 | (UInt32)currentmessage.Payload[1] << 16 |
                                 (UInt32)currentmessage.Payload[2] << 8 | (UInt32)currentmessage.Payload[3];
-
+                DataValid = true;
                 return DataValid;
             }
 
@@ -885,10 +903,10 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                DataValid = true;
+                
 
                 Forced_Holdover = currentmessage.Payload[0] == 1 ? false : true;
-
+                DataValid = true;
                 return DataValid;
             }
         }
@@ -916,10 +934,10 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                DataValid = true;
+                
 
                 RemoteAllowed = currentmessage.Payload[0] == 1 ? false : true;
-
+                DataValid = true;
                 return DataValid;
             }
         }
@@ -1490,6 +1508,8 @@ namespace EpsilWin_LA2YUA
                     return false;
                 }
 
+                DataValid = true;
+
                 Software_Version = currentmessage.Payload[4];
                 Update_Version = currentmessage.Payload[5];
 
@@ -1572,7 +1592,7 @@ namespace EpsilWin_LA2YUA
 
                 Relay_On_PhFreq_Limit = (byte)(currentmessage.Payload[8] & 0b00010000) == 0;
 
-                DataValid = true;
+                
                 return DataValid;
             }
         }

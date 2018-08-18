@@ -70,7 +70,7 @@ namespace EpsilWin_LA2YUA
 
             // documented in series 3 manual
             Manual_Frequency_Write = 20,
-            Manual_Frequency_Read = 85
+            Manual_Frequency_Read = 84
         };
 
         public enum EpsilonCommandAccessType
@@ -701,6 +701,71 @@ namespace EpsilWin_LA2YUA
 
         }
 
+        public class EpsilonManualFrequencyCorrection
+        {
+            public EpsilonCommandsIndex ReadCommand;
+            public EpsilonCommandsIndex WriteCommand;
+            public bool DataValid;
+            public decimal FreqCorrectionValue
+            {
+                get
+                {
+                    return (decimal)_ppscorrectionvalue / 1000;
+                }
+                set
+                {
+                    _ppscorrectionvalue = (Int32)(value * 1000);
+
+                    if (_ppscorrectionvalue > _ppscorrectionvalue_highlimit)
+                    {
+                        _ppscorrectionvalue = _ppscorrectionvalue_highlimit;
+                    }
+                    else if (_ppscorrectionvalue < _ppscorrectionvalue_lowlimit)
+                    {
+                        _ppscorrectionvalue = _ppscorrectionvalue_lowlimit;
+                    }
+                }
+            }
+            private Int32 _ppscorrectionvalue_highlimit = 50000;
+            private Int32 _ppscorrectionvalue_lowlimit = -50000;
+            private Int32 _ppscorrectionvalue;
+
+            public EpsilonManualFrequencyCorrection()
+            {
+                ReadCommand = EpsilonCommandsIndex.Manual_Frequency_Read;
+            }
+
+            public bool Serialize(out List<byte> payload)
+            {
+                payload = new List<byte>(4);
+
+                Int32 val = _ppscorrectionvalue;
+
+                payload.Add((byte)((Int32)val >> 24));
+                payload.Add((byte)((Int32)val >> 16));
+                payload.Add((byte)((Int32)val >> 8));
+                payload.Add((byte)((Int32)val & 0xff));
+
+
+                return true;
+            }
+
+            public bool ProcessMessage(EpsilonSerialMessage currentmessage)
+            {
+                if (currentmessage.MessageID != (byte)ReadCommand)
+                {
+                    return false;
+                }
+                DataValid = true;
+
+                _ppscorrectionvalue = (Int32)currentmessage.Payload[0] << 24 | (Int32)currentmessage.Payload[1] << 16 |
+                                (Int32)currentmessage.Payload[2] << 8 | (Int32)currentmessage.Payload[3];
+
+                return DataValid;
+            }
+
+        }
+
         public class EpsilonManual1PPSPhaseCorrection
         {
             public EpsilonCommandsIndex ReadCommand;
@@ -753,7 +818,7 @@ namespace EpsilWin_LA2YUA
                 }
                 DataValid = true;
 
-                PPSCorrectionValue = (Int32)currentmessage.Payload[0] << 24 | (Int32)currentmessage.Payload[1] << 16 |
+                _ppscorrectionvalue = (Int32)currentmessage.Payload[0] << 24 | (Int32)currentmessage.Payload[1] << 16 |
                                 (Int32)currentmessage.Payload[2] << 8 | (Int32)currentmessage.Payload[3];
 
                 return DataValid;
@@ -879,6 +944,7 @@ namespace EpsilWin_LA2YUA
             public EpsilonDisplay DisplayInfo;
             public EpsilonManual1PPSPhaseCorrection Manual1PPS;
             public EpsilonManualTOD GPSTimeInit;
+            public EpsilonManualFrequencyCorrection ManualFreqCorrection;
 
             public EpsilonDeviceContext()
             {
@@ -902,8 +968,10 @@ namespace EpsilWin_LA2YUA
                 DisplayInfo = new EpsilonDisplay();
                 RemoteControlAuthorized = new EpsilonRemoteControl();
                 GPSTimeInit = new EpsilonManualTOD();
-
+                ManualFreqCorrection = new EpsilonManualFrequencyCorrection();
                 GPSTimeInit.ReadCommand = EpsilonCommandsIndex.GPS_Init_Time_Read;
+
+
 
                 Populate_Epsilon_Command_List();
 
@@ -984,6 +1052,9 @@ namespace EpsilWin_LA2YUA
                         break;
                     case EpsilonCommandsIndex.GPS_Init_Time_Read:
                         retval = GPSTimeInit.ProcessMessage(currentmessage);
+                        break;
+                    case EpsilonCommandsIndex.Manual_Frequency_Read:
+                        retval = ManualFreqCorrection.ProcessMessage(currentmessage);
                         break;
                 }
 
@@ -1151,6 +1222,14 @@ namespace EpsilWin_LA2YUA
                 Manual1PPS.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
+                e.Command_Index = EpsilonCommandsIndex.Manual_Frequency_Read;
+                e.Payload_Size = 4;
+                e.FriendlyName = "Manual Frequency Adjust";
+                e.ReadWrite = EpsilonCommandAccessType.Read;
+                e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
+                Epsilon_Command_List.Add((int)e.Command_Index, e);
+
+                e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Remote_Control_Read;
                 e.Payload_Size = 1;
                 e.FriendlyName = "Remote Control Enable";
@@ -1265,6 +1344,14 @@ namespace EpsilWin_LA2YUA
                 e.Command_Index = EpsilonCommandsIndex.Manual_1PPS_Write;
                 e.Payload_Size = 4;
                 e.FriendlyName = "Manual Time 1PPS Phase Adjust";
+                e.ReadWrite = EpsilonCommandAccessType.Write;
+                e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Only_Holdover;
+                Epsilon_Command_List.Add((int)e.Command_Index, e);
+
+                e = new EpsilonCommandInfo();
+                e.Command_Index = EpsilonCommandsIndex.Manual_Frequency_Write;
+                e.Payload_Size = 4;
+                e.FriendlyName = "Manual Frequency Adjust";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Only_Holdover;
                 Epsilon_Command_List.Add((int)e.Command_Index, e);

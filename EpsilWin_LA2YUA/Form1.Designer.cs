@@ -149,6 +149,11 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.button4_Set_Freq_Manual = new System.Windows.Forms.Button();
+            this.button5_Get_Freq_Manual = new System.Windows.Forms.Button();
+            this.numericUpDown9 = new System.Windows.Forms.NumericUpDown();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -179,13 +184,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.groupBox9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 712);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 678);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1006, 22);
             this.statusStrip1.TabIndex = 1;
@@ -208,7 +214,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 27);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(982, 607);
+            this.tabControl1.Size = new System.Drawing.Size(982, 573);
             this.tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -390,7 +396,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(974, 581);
+            this.tabPage2.Size = new System.Drawing.Size(974, 547);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -401,12 +407,13 @@
             this.groupBox8.Controls.Add(this.button6__Get_Remote);
             this.groupBox8.Controls.Add(this.checkBox1);
             this.groupBox8.Controls.Add(this.label3);
+            this.groupBox8.Controls.Add(this.button7_Reset);
             this.groupBox8.Location = new System.Drawing.Point(685, 311);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(269, 122);
             this.groupBox8.TabIndex = 6;
             this.groupBox8.TabStop = false;
-            this.groupBox8.Text = "Remote Control";
+            this.groupBox8.Text = "Control";
             // 
             // button5_Set_Remote
             // 
@@ -454,6 +461,10 @@
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.label29);
+            this.groupBox7.Controls.Add(this.button4_Set_Freq_Manual);
+            this.groupBox7.Controls.Add(this.button5_Get_Freq_Manual);
+            this.groupBox7.Controls.Add(this.numericUpDown9);
             this.groupBox7.Controls.Add(this.radioButton7_minus);
             this.groupBox7.Controls.Add(this.radioButton6_plus);
             this.groupBox7.Controls.Add(this.numericUpDown11_Loc_Minutes);
@@ -462,7 +473,6 @@
             this.groupBox7.Controls.Add(this.button4_Get_Step_Seconds);
             this.groupBox7.Controls.Add(this.label32);
             this.groupBox7.Controls.Add(this.label30);
-            this.groupBox7.Controls.Add(this.button7_Reset);
             this.groupBox7.Controls.Add(this.label28);
             this.groupBox7.Controls.Add(this.button23_Set_1PPS_Ph);
             this.groupBox7.Controls.Add(this.button24_Get_1PPS_Phase);
@@ -579,7 +589,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(6, 222);
+            this.label30.Location = new System.Drawing.Point(6, 256);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(260, 39);
             this.label30.TabIndex = 28;
@@ -589,7 +599,7 @@
             // 
             this.button7_Reset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.button7_Reset.BackColor = System.Drawing.Color.OrangeRed;
-            this.button7_Reset.Location = new System.Drawing.Point(6, 268);
+            this.button7_Reset.Location = new System.Drawing.Point(6, 89);
             this.button7_Reset.Name = "button7_Reset";
             this.button7_Reset.Size = new System.Drawing.Size(257, 23);
             this.button7_Reset.TabIndex = 27;
@@ -1481,7 +1491,7 @@
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label4.Location = new System.Drawing.Point(508, 638);
+            this.label4.Location = new System.Drawing.Point(508, 604);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(54, 19);
             this.label4.TabIndex = 9;
@@ -1492,7 +1502,7 @@
             this.richTextBox1_Serial_Log.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1_Serial_Log.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBox1_Serial_Log.Location = new System.Drawing.Point(12, 638);
+            this.richTextBox1_Serial_Log.Location = new System.Drawing.Point(12, 604);
             this.richTextBox1_Serial_Log.Name = "richTextBox1_Serial_Log";
             this.richTextBox1_Serial_Log.ReadOnly = true;
             this.richTextBox1_Serial_Log.Size = new System.Drawing.Size(490, 71);
@@ -1506,7 +1516,7 @@
             this.label5_Status_time.AutoSize = true;
             this.label5_Status_time.Font = new System.Drawing.Font("Consolas", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5_Status_time.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label5_Status_time.Location = new System.Drawing.Point(508, 666);
+            this.label5_Status_time.Location = new System.Drawing.Point(508, 632);
             this.label5_Status_time.Name = "label5_Status_time";
             this.label5_Status_time.Size = new System.Drawing.Size(479, 43);
             this.label5_Status_time.TabIndex = 11;
@@ -1546,6 +1556,7 @@
             // 
             // groupBox9
             // 
+            this.groupBox9.Controls.Add(this.label5);
             this.groupBox9.Controls.Add(this.button1);
             this.groupBox9.Controls.Add(this.button2);
             this.groupBox9.Controls.Add(this.button3);
@@ -1602,11 +1613,70 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click_1);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 45);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(163, 26);
+            this.label5.TabIndex = 29;
+            this.label5.Text = "Note:\r\nThis command will fail on series 2";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(4, 222);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(55, 13);
+            this.label29.TabIndex = 40;
+            this.label29.Text = "Freq [ppb]";
+            // 
+            // button4_Set_Freq_Manual
+            // 
+            this.button4_Set_Freq_Manual.Enabled = false;
+            this.button4_Set_Freq_Manual.Location = new System.Drawing.Point(226, 220);
+            this.button4_Set_Freq_Manual.Name = "button4_Set_Freq_Manual";
+            this.button4_Set_Freq_Manual.Size = new System.Drawing.Size(37, 23);
+            this.button4_Set_Freq_Manual.TabIndex = 39;
+            this.button4_Set_Freq_Manual.Text = "Set";
+            this.button4_Set_Freq_Manual.UseVisualStyleBackColor = true;
+            this.button4_Set_Freq_Manual.Click += new System.EventHandler(this.button4_Click_2);
+            // 
+            // button5_Get_Freq_Manual
+            // 
+            this.button5_Get_Freq_Manual.Location = new System.Drawing.Point(183, 220);
+            this.button5_Get_Freq_Manual.Name = "button5_Get_Freq_Manual";
+            this.button5_Get_Freq_Manual.Size = new System.Drawing.Size(37, 23);
+            this.button5_Get_Freq_Manual.TabIndex = 38;
+            this.button5_Get_Freq_Manual.Text = "Get";
+            this.button5_Get_Freq_Manual.UseVisualStyleBackColor = true;
+            this.button5_Get_Freq_Manual.Click += new System.EventHandler(this.button5_Click_1);
+            // 
+            // numericUpDown9
+            // 
+            this.numericUpDown9.DecimalPlaces = 3;
+            this.numericUpDown9.Enabled = false;
+            this.numericUpDown9.Location = new System.Drawing.Point(97, 220);
+            this.numericUpDown9.Maximum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.numericUpDown9.Minimum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDown9.Name = "numericUpDown9";
+            this.numericUpDown9.Size = new System.Drawing.Size(75, 20);
+            this.numericUpDown9.TabIndex = 37;
+            this.numericUpDown9.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1006, 734);
+            this.ClientSize = new System.Drawing.Size(1006, 700);
             this.Controls.Add(this.button25_Read_All);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label5_Status_time);
@@ -1619,7 +1689,7 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.DoubleBuffered = true;
-            this.MinimumSize = new System.Drawing.Size(1022, 638);
+            this.MinimumSize = new System.Drawing.Size(1022, 739);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -1661,6 +1731,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1788,6 +1860,11 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.DateTimePicker dateTimePicker1_GPS_Time;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.Button button4_Set_Freq_Manual;
+        private System.Windows.Forms.Button button5_Get_Freq_Manual;
+        private System.Windows.Forms.NumericUpDown numericUpDown9;
     }
 }
 

@@ -825,7 +825,9 @@ namespace EpsilWin_LA2YUA
                                     button2.BackColor = Color.LightGreen;
                                     button3.BackColor = Color.LightGreen;
                                     break;
-
+                                case EpsilonCommandsIndex.Manual_Frequency_Write:
+                                    button4_Set_Freq_Manual.BackColor = Color.LightGreen;
+                                    break;
                             }
                             break;
                         case EpsilonCommandsIndex.Remote_Control_Read: // Remote Control
@@ -1031,6 +1033,12 @@ namespace EpsilWin_LA2YUA
                             button2_Get_TOD.BackColor = Color.LightGreen;
                             button1_Set_TOD_Output.Enabled = true;
 
+                            break;
+                        case EpsilonCommandsIndex.Manual_Frequency_Read:
+                            numericUpDown9.Value = epsilondevice.ManualFreqCorrection.FreqCorrectionValue;
+                            numericUpDown9.Enabled = true;
+                            button4_Set_Freq_Manual.Enabled = true;
+                            button5_Get_Freq_Manual.BackColor = Color.LightGreen;
                             break;
                         case EpsilonCommandsIndex.Status_Read: // status output
                             
@@ -1299,6 +1307,7 @@ namespace EpsilWin_LA2YUA
             button9_Read_GPS.PerformClick();
             button6__Get_Remote.PerformClick();
             button1.PerformClick();
+            button5_Get_Freq_Manual.PerformClick();
 
             // put tabcontrol back to the old tab
             tabControl1.SelectTab(oldindex);
@@ -1879,6 +1888,29 @@ namespace EpsilWin_LA2YUA
             DateTime time = DateTime.UtcNow.AddSeconds(1);
 
             Write_Manual_Date(time, EpsilonCommandsIndex.GPS_Init_Time_Write);
+        }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.BackColor = Color.Orange;
+
+            Epsilon_Issue_Command(EpsilonCommandsIndex.Manual_Frequency_Read);
+        }
+
+        private void button4_Click_2(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.BackColor = Color.Orange;
+
+
+            EpsilonManualFrequencyCorrection freq = new EpsilonManualFrequencyCorrection();
+
+            freq.FreqCorrectionValue = numericUpDown9.Value;
+
+            freq.Serialize(out List<byte> payload);
+
+            Epsilon_Issue_Command(EpsilonCommandsIndex.Manual_Frequency_Write, payload);
         }
     }
 }

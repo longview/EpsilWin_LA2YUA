@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
 using System.Device.Location;
+using System.Diagnostics;
 
 namespace EpsilWin_LA2YUA
 {
@@ -55,6 +56,12 @@ namespace EpsilWin_LA2YUA
             {
                 richTextBox1_Serial_Log.AppendText("Transmit: unknown command.\n");
                 return;
+            }
+
+           //Debug.Assert(command == e.Command_Index);
+           if (command != e.Command_Index)
+            {
+                throw new Exception("Command lookup returned wrong command ID. World is upside down.");
             }
 
             // TODO: Check if requirements to transmit are met, largely not important since the device just NACKs if there's something wrong
@@ -751,7 +758,7 @@ namespace EpsilWin_LA2YUA
                     EpsilonCommandInfo e;
                     if (!epsilondevice.Epsilon_Command_List.TryGetValue(currentmessage.MessageID, out e))
                     {
-                        e = new EpsilonCommandInfo();
+                        e.Clone(out e);
                         e.Command_Index = EpsilonCommandsIndex.UNKNOWN_COMMAND;
                     }
                     else if (!epsilondevice.ProcessRXCommand(currentmessage))
@@ -759,6 +766,7 @@ namespace EpsilWin_LA2YUA
                         //sb.AppendFormat("Receiver: Decode failed for message\n");
                         if (e.ReadWrite == EpsilonCommandAccessType.Read)
                         {
+                            e.Clone(out e);
                             e.Command_Index = EpsilonCommandsIndex.DECODE_FAILED;
                         }
                     }

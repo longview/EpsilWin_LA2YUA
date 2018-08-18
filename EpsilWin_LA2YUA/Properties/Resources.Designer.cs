@@ -62,7 +62,7 @@ namespace EpsilWin_LA2YUA.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1044{\fonttbl{\f0\fnil\fcharset0 Consolas;}{\f1\fnil\fcharset2 Symbol;}}
-        ///{\*\generator Riched20 10.0.17134}\viewkind4\uc1 
+        ///{\*\generator Riched20 10.0.15063}\viewkind4\uc1 
         ///\pard\sa200\sl276\slmult1\b\f0\fs28\lang9 Notes:\par
         ///
         ///\pard\b0\fs18\lang1044 The Serial Post list is automatically populated with port numbers reported by the OS.\par

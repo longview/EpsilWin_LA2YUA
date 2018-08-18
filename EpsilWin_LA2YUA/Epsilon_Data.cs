@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
 using System.Device.Location;
+using System.Collections.ObjectModel;
 
 namespace EpsilWin_LA2YUA
 {
@@ -100,16 +101,134 @@ namespace EpsilWin_LA2YUA
 
         public class EpsilonCommandInfo
         {
-            public EpsilonCommandsIndex Command_Index;
-            public byte Payload_Size;
-            public string FriendlyName; // name for error reporting, ACK etc.
-            public EpsilonCommandAccessType ReadWrite;
-            public EpsilonCommandWriteConditions Write_Conditions;
-            public EpsilonCommandResponseType Command_Response_Type;
+            public EpsilonCommandsIndex Command_Index
+            {
+                set
+                {
+                    if (!_readonly)
+                        _commandindex = value;
+                    else
+                        throw new Exception("Attempted to modify read only command");
+                }
+                get
+                {
+                    return _commandindex;
+                }
+            }
+
+            private EpsilonCommandsIndex _commandindex;
+
+            public byte Payload_Size
+            {
+                set
+                {
+                    if (!_readonly)
+                        _payloadsize = value;
+                    else
+                        throw new Exception("Attempted to modify read only command");
+                }
+                get
+                {
+                    return _payloadsize;
+                }
+            }
+
+            private byte _payloadsize;
+
+            public string FriendlyName // name for error reporting, ACK etc.
+            {
+                set
+                {
+                    if (!_readonly)
+                        _friendlyname = value;
+                    else
+                        throw new Exception("Attempted to modify read only command");
+                }
+                get
+                {
+                    return _friendlyname;
+                }
+            }
+
+            private string _friendlyname;
+
+
+
+            public EpsilonCommandAccessType ReadWrite
+            {
+                set
+                {
+                    if (!_readonly)
+                        _readwrite = value;
+                    else
+                        throw new Exception("Attempted to modify read only command");
+                }
+                get
+                {
+                    return _readwrite;
+                }
+            }
+
+            private EpsilonCommandAccessType _readwrite;
+
+
+            public EpsilonCommandWriteConditions Write_Conditions
+            {
+                set
+                {
+                    if (!_readonly)
+                        _writeconditions = value;
+                    else
+                        throw new Exception("Attempted to modify read only command");
+                }
+                get
+                {
+                    return _writeconditions;
+                }
+            }
+
+            private EpsilonCommandWriteConditions _writeconditions;
+
+            public EpsilonCommandResponseType Command_Response_Type
+            {
+                set
+                {
+                    if (!_readonly)
+                        _commandresponsetype = value;
+                    else
+                        throw new Exception("Attempted to modify read only command");
+                }
+                get
+                {
+                    return _commandresponsetype;
+                }
+            }
+
+            private EpsilonCommandResponseType _commandresponsetype;
+
+            private bool _readonly;
 
             public EpsilonCommandInfo()
             {
                 Command_Response_Type = EpsilonCommandResponseType.N_A;
+                _readonly = false;
+            }
+
+            public void SetReadOnly()
+            {
+                _readonly = true;
+            }
+
+            // return a clone of the current object that can be modified
+            public void Clone(out EpsilonCommandInfo e)
+            {
+                e = new EpsilonCommandInfo();
+                e.Command_Response_Type = Command_Response_Type;
+                e.FriendlyName = FriendlyName;
+                e.Payload_Size = Payload_Size;
+                e.ReadWrite = ReadWrite;
+                e.Write_Conditions = Write_Conditions;
+                e.Command_Index = Command_Index;
             }
         }
 
@@ -265,7 +384,7 @@ namespace EpsilWin_LA2YUA
                 TOD_Format_5 = 197,
             }
 
-            public bool ProcessMessage(EpsilonSerialMessage currentmessage, ref Dictionary<int, EpsilonCommandInfo> info)
+            public bool ProcessMessage(EpsilonSerialMessage currentmessage, ReadOnlyDictionary<int, EpsilonCommandInfo> info)
             {
                 DataValid = true;
                 DateTime receivedtime = new DateTime();
@@ -976,7 +1095,7 @@ namespace EpsilWin_LA2YUA
 
             public EpsilonDeviceContext()
             {
-                Epsilon_Command_List = new Dictionary<int, EpsilonCommandInfo>();
+                _Epsilon_Command_List = new Dictionary<int, EpsilonCommandInfo>();
                 
 
                 LastStatusMessage = new EpsilonStatusMessageResponse();
@@ -1003,9 +1122,26 @@ namespace EpsilWin_LA2YUA
 
                 Populate_Epsilon_Command_List();
 
+                // set each item to read only to generate exceptions if any modifications are made to the dictionary content
+                foreach (KeyValuePair<int, EpsilonCommandInfo> key in _Epsilon_Command_List)
+                {
+                    key.Value.SetReadOnly();
+                }
+
+                //Epsilon_Command_List = new ReadOnlyDictionary<int, EpsilonCommandInfo>(_Epsilon_Command_List);
+
             }
 
-            public Dictionary<int, EpsilonCommandInfo> Epsilon_Command_List;
+            private Dictionary<int, EpsilonCommandInfo> _Epsilon_Command_List;
+
+            // 
+            public ReadOnlyDictionary<int, EpsilonCommandInfo> Epsilon_Command_List
+            {
+                get
+                {
+                    return new ReadOnlyDictionary<int, EpsilonCommandInfo>(_Epsilon_Command_List);
+                }
+            }
 
             public bool ProcessRXCommand(EpsilonSerialMessage currentmessage)
             {
@@ -1067,7 +1203,7 @@ namespace EpsilWin_LA2YUA
                     case EpsilonCommandsIndex.TOD_Format_3:
                     case EpsilonCommandsIndex.TOD_Format_4:
                     case EpsilonCommandsIndex.TOD_Format_5:
-                        retval = TOD_Information.ProcessMessage(currentmessage, ref Epsilon_Command_List);
+                        retval = TOD_Information.ProcessMessage(currentmessage, Epsilon_Command_List);
                         break;
                     case EpsilonCommandsIndex.TOD_Period_Read:
                         retval = TOD_Output_Period.ProcessMessage(currentmessage);
@@ -1102,7 +1238,7 @@ namespace EpsilWin_LA2YUA
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.FriendlyName = "TOD Format 1";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 
 
                 e = new EpsilonCommandInfo();
@@ -1111,7 +1247,7 @@ namespace EpsilWin_LA2YUA
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.FriendlyName = "TOD Format 2";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
 
                 e = new EpsilonCommandInfo();
@@ -1120,7 +1256,7 @@ namespace EpsilWin_LA2YUA
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.FriendlyName = "TOD Format 3 (DoY/Y)";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.TOD_Format_4;
@@ -1128,7 +1264,7 @@ namespace EpsilWin_LA2YUA
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.FriendlyName = "TOD Format 4 (MJD Double)";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.TOD_Format_5;
@@ -1136,7 +1272,7 @@ namespace EpsilWin_LA2YUA
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.FriendlyName = "TOD Format 5 (MJD Integer)";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Status_Read;
@@ -1144,7 +1280,7 @@ namespace EpsilWin_LA2YUA
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.FriendlyName = "Status";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 LastStatusMessage.ReadCommand = e.Command_Index;
 
@@ -1155,7 +1291,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Time of Day Configuration";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 TOD_Setup.ReadCommand = e.Command_Index;
 
@@ -1165,7 +1301,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Time of Day Interval";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 TOD_Output_Period.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1174,7 +1310,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "GPS Parameters";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 GPS_Info.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1183,7 +1319,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Local Time Offset";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 Local_Time_Offset.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1192,7 +1328,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Display/TOD Format";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 DisplayInfo.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1201,7 +1337,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Alarm Limits";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 AlarmInfo.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1210,7 +1346,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Version/Hardware Info";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 LastVersionMessage.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1219,7 +1355,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Forced Holdover Status";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 Forced_Holdover.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1228,7 +1364,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Time Set";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 ManualTimeSetting.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1237,7 +1373,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Time Second Offset";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 ManualSecondCorrection.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1246,7 +1382,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Time 1PPS Phase Adjust";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 Manual1PPS.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1255,7 +1391,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Frequency Adjust";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Remote_Control_Read;
@@ -1263,7 +1399,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Remote Control Enable";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 RemoteControlAuthorized.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1272,7 +1408,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Antenna Phase Correction";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 Phase_Correction_Value.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1281,7 +1417,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Leap Second Information";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 Leap_Second_Information.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1292,7 +1428,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Time of Day Configuration";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
 
                 e = new EpsilonCommandInfo();
@@ -1301,7 +1437,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Time of Day Interval";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.GPS_Init_Write;
@@ -1309,7 +1445,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "GPS Parameters";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_No_Holdover;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Local_Time_Write;
@@ -1317,7 +1453,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Local Time Offset";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_No_Holdover;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Display_Write;
@@ -1325,7 +1461,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Display/TOD Format";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Alarm_Limit_Write;
@@ -1333,7 +1469,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Alarm Limits";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Version_Write;
@@ -1341,7 +1477,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Version/Hardware Info";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 //LastVersionMessage.ReadCommand = e.Command_Index;
 
                 e = new EpsilonCommandInfo();
@@ -1350,7 +1486,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Forced Holdover Status";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Manual_Time_Write;
@@ -1358,7 +1494,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Time Set";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Only_Holdover;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Manual_Second_Write;
@@ -1366,7 +1502,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Time Second Offset";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Only_Holdover;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Manual_1PPS_Write;
@@ -1374,7 +1510,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Time 1PPS Phase Adjust";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Only_Holdover;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Manual_Frequency_Write;
@@ -1382,7 +1518,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Manual Frequency Adjust";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Only_Holdover;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Remote_Control_Write;
@@ -1390,7 +1526,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Remote Control Enable";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Phase_Correction_Write;
@@ -1398,7 +1534,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Antenna Phase Correction";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Leap_Second_Write;
@@ -1406,7 +1542,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Leap Second Information";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Reset_Clock_Write;
@@ -1414,7 +1550,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Clock Soft Reset";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.Error_Code;
@@ -1422,7 +1558,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "Error Code";
                 e.ReadWrite = EpsilonCommandAccessType.N_A;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
 
                 // documented in series 1 and 3 manual
@@ -1433,7 +1569,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "GPS Receiver Time";
                 e.ReadWrite = EpsilonCommandAccessType.Read;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.GPS_Init_Time_Write;
@@ -1441,7 +1577,7 @@ namespace EpsilWin_LA2YUA
                 e.FriendlyName = "GPS Receiver Time";
                 e.ReadWrite = EpsilonCommandAccessType.Write;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
-                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                _Epsilon_Command_List.Add((int)e.Command_Index, e);
                 
             }
         }

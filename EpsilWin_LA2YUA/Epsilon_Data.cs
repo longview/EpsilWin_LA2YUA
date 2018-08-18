@@ -61,13 +61,23 @@ namespace EpsilWin_LA2YUA
 
             Error_Code = 64,
             Reset_Clock_Write = 16,
-            UNKNOWN_COMMAND = 0
+            UNKNOWN_COMMAND = 255,
+            DECODE_FAILED = 254,
+
+            // documented in series 1 manual
+            GPS_Init_Time_Read = 68,
+            GPS_Init_Time_Write = 4,
+
+            // documented in series 3 manual
+            Manual_Frequency_Write = 20,
+            Manual_Frequency_Read = 85
         };
 
         public enum EpsilonCommandAccessType
         {
             Read,
-            Write
+            Write,
+            N_A
         };
 
         // special conditions for allowing a write
@@ -199,7 +209,28 @@ namespace EpsilWin_LA2YUA
                 DataValid = true;
 
 
-                GetDisplayMode = (DisplayMode)currentmessage.Payload[0];
+                switch (currentmessage.Payload[0])
+                {
+                    case 0:
+                        GetDisplayMode = DisplayMode.TOD_Format_1;
+                        break;
+                    case 1:
+                        GetDisplayMode = DisplayMode.TOD_Format_2;
+                        break;
+                    case 2:
+                        GetDisplayMode = DisplayMode.TOD_Format_3;
+                        break;
+                    case 3:
+                        GetDisplayMode = DisplayMode.TOD_Format_4;
+                        break;
+                    case 4:
+                        GetDisplayMode = DisplayMode.TOD_Format_5;
+                        break;
+                    default:
+                        return false;
+                }
+
+                DataValid = true;
 
                 return DataValid;
             }
@@ -524,7 +555,30 @@ namespace EpsilWin_LA2YUA
         {
             public EpsilonCommandsIndex ReadCommand;
             public EpsilonCommandsIndex WriteCommand;
-            public DateTime ManualTime;
+            public DateTime ManualTime
+            {
+                get
+                {
+                    return _manualtime;
+                }
+                set
+                {
+                    if (DateTime.Compare(value, minimumtime) < 0)
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+                    if (DateTime.Compare(value, maximumtime) > 0)
+                    {
+                        throw new ArgumentOutOfRangeException();
+                    }
+                    _manualtime = value;
+                }
+
+            }
+
+            public DateTime minimumtime = new DateTime(1992, 1, 1, 0, 0, 0);
+            public DateTime maximumtime = new DateTime(2127, 12, 31, 23, 59, 59);
+            private DateTime _manualtime;
 
             public bool DataValid;
 
@@ -553,16 +607,22 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                DataValid = true;
-
-                ManualTime = new DateTime((int)(currentmessage.Payload[2] << 8 | currentmessage.Payload[3]),
-                                (int)currentmessage.Payload[1],
-                                (int)currentmessage.Payload[0],
-                                (int)currentmessage.Payload[4],
-                                (int)currentmessage.Payload[5],
-                                (int)currentmessage.Payload[6]);
-
-                return DataValid;
+                //DataValid = true;
+                try
+                {
+                    DateTime rx = new DateTime((int)(currentmessage.Payload[2] << 8 | currentmessage.Payload[3]),
+                                    (int)currentmessage.Payload[1],
+                                    (int)currentmessage.Payload[0],
+                                    (int)currentmessage.Payload[4],
+                                    (int)currentmessage.Payload[5],
+                                    (int)currentmessage.Payload[6]);
+                    ManualTime = rx;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
 
         }
@@ -818,6 +878,7 @@ namespace EpsilWin_LA2YUA
             public EpsilonAlarmInformation AlarmInfo;
             public EpsilonDisplay DisplayInfo;
             public EpsilonManual1PPSPhaseCorrection Manual1PPS;
+            public EpsilonManualTOD GPSTimeInit;
 
             public EpsilonDeviceContext()
             {
@@ -840,6 +901,9 @@ namespace EpsilWin_LA2YUA
                 Manual1PPS = new EpsilonManual1PPSPhaseCorrection();
                 DisplayInfo = new EpsilonDisplay();
                 RemoteControlAuthorized = new EpsilonRemoteControl();
+                GPSTimeInit = new EpsilonManualTOD();
+
+                GPSTimeInit.ReadCommand = EpsilonCommandsIndex.GPS_Init_Time_Read;
 
                 Populate_Epsilon_Command_List();
 
@@ -918,7 +982,9 @@ namespace EpsilWin_LA2YUA
                     case EpsilonCommandsIndex.Version_Read:
                         retval = LastVersionMessage.ProcessMessage(currentmessage);
                         break;
-
+                    case EpsilonCommandsIndex.GPS_Init_Time_Read:
+                        retval = GPSTimeInit.ProcessMessage(currentmessage);
+                        break;
                 }
 
                 return retval;
@@ -1239,11 +1305,29 @@ namespace EpsilWin_LA2YUA
                 e.Command_Index = EpsilonCommandsIndex.Error_Code;
                 e.Payload_Size = 0;
                 e.FriendlyName = "Error Code";
-                e.ReadWrite = EpsilonCommandAccessType.Read;
+                e.ReadWrite = EpsilonCommandAccessType.N_A;
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
                 Epsilon_Command_List.Add((int)e.Command_Index, e);
 
 
+                // documented in series 1 and 3 manual
+
+                e = new EpsilonCommandInfo();
+                e.Command_Index = EpsilonCommandsIndex.GPS_Init_Time_Read;
+                e.Payload_Size = 7;
+                e.FriendlyName = "GPS Receiver Time";
+                e.ReadWrite = EpsilonCommandAccessType.Read;
+                e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
+                Epsilon_Command_List.Add((int)e.Command_Index, e);
+
+                e = new EpsilonCommandInfo();
+                e.Command_Index = EpsilonCommandsIndex.GPS_Init_Time_Write;
+                e.Payload_Size = 7;
+                e.FriendlyName = "GPS Receiver Time";
+                e.ReadWrite = EpsilonCommandAccessType.Write;
+                e.Write_Conditions = EpsilonCommandWriteConditions.Remote_Must_Be_Set;
+                Epsilon_Command_List.Add((int)e.Command_Index, e);
+                
             }
         }
 
@@ -1325,6 +1409,7 @@ namespace EpsilWin_LA2YUA
 
 
                 // it looks like the data sheet swaps char 8 and 9 for this command
+                // yup it's definitely swapped
 
                 Clock_Series_No = (byte)(currentmessage.Payload[9] & 0b00000011);
                 Power_24V = (currentmessage.Payload[9] & 0b00000100) > 0 ? PowerInputTypes.DCPower24V : PowerInputTypes.DCPower48V;
@@ -1413,7 +1498,6 @@ namespace EpsilWin_LA2YUA
             public Int32 GPS_Latitude_ms;
             public Int32 GPS_Longtitude_ms;
             public Int32 GPS_Altitude_cm;
-            // TODO: implement a setter that updates the int32 representations
             private GeoCoordinate GPS_Position_;
             public GeoCoordinate GPS_Position
             {

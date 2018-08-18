@@ -144,6 +144,11 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1_Status_Auto = new System.Windows.Forms.Timer(this.components);
             this.timer1_Time_Timeout = new System.Windows.Forms.Timer(this.components);
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.dateTimePicker1_GPS_Time = new System.Windows.Forms.DateTimePicker();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -173,6 +178,7 @@
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tabPage3.SuspendLayout();
+            this.groupBox9.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -374,6 +380,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.groupBox9);
             this.tabPage2.Controls.Add(this.groupBox8);
             this.tabPage2.Controls.Add(this.groupBox7);
             this.tabPage2.Controls.Add(this.groupBox6);
@@ -1537,6 +1544,64 @@
             this.timer1_Time_Timeout.Interval = 1200;
             this.timer1_Time_Timeout.Tick += new System.EventHandler(this.timer1_Time_Timeout_Tick);
             // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.button1);
+            this.groupBox9.Controls.Add(this.button2);
+            this.groupBox9.Controls.Add(this.button3);
+            this.groupBox9.Controls.Add(this.dateTimePicker1_GPS_Time);
+            this.groupBox9.Location = new System.Drawing.Point(6, 439);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(330, 100);
+            this.groupBox9.TabIndex = 7;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Manual GPS Time (Series 1 and 3)";
+            // 
+            // dateTimePicker1_GPS_Time
+            // 
+            this.dateTimePicker1_GPS_Time.CustomFormat = "yyyy-MM-dd hh:mm:ss";
+            this.dateTimePicker1_GPS_Time.Enabled = false;
+            this.dateTimePicker1_GPS_Time.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePicker1_GPS_Time.Location = new System.Drawing.Point(6, 19);
+            this.dateTimePicker1_GPS_Time.MaxDate = new System.DateTime(2127, 12, 31, 0, 0, 0, 0);
+            this.dateTimePicker1_GPS_Time.MinDate = new System.DateTime(1992, 1, 1, 0, 0, 0, 0);
+            this.dateTimePicker1_GPS_Time.Name = "dateTimePicker1_GPS_Time";
+            this.dateTimePicker1_GPS_Time.Size = new System.Drawing.Size(151, 20);
+            this.dateTimePicker1_GPS_Time.TabIndex = 11;
+            this.dateTimePicker1_GPS_Time.Value = new System.DateTime(1992, 1, 1, 0, 0, 0, 0);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(169, 19);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(37, 23);
+            this.button1.TabIndex = 22;
+            this.button1.Text = "Get";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // button2
+            // 
+            this.button2.Enabled = false;
+            this.button2.Location = new System.Drawing.Point(255, 19);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(69, 23);
+            this.button2.TabIndex = 21;
+            this.button2.Text = "Set Now";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click_2);
+            // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(212, 19);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(37, 23);
+            this.button3.TabIndex = 20;
+            this.button3.Text = "Set";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1595,6 +1660,7 @@
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.tabPage3.ResumeLayout(false);
+            this.groupBox9.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1717,6 +1783,11 @@
         private System.Windows.Forms.RadioButton radioButton7_minus;
         private System.Windows.Forms.RadioButton radioButton6_plus;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.GroupBox groupBox9;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1_GPS_Time;
     }
 }
 

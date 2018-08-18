@@ -46,6 +46,7 @@ namespace EpsilWin_LA2YUA
         EpsilonDeviceContext epsilondevice;
 
         // request a read of any command (command must be listed in the command list)
+        // payload is optional for read commands
         void Epsilon_Issue_Command(EpsilonCommandsIndex command, List<byte> payload = null)
         {
             // look up command information
@@ -56,7 +57,7 @@ namespace EpsilWin_LA2YUA
                 return;
             }
 
-            // TODO: Check if requirements to transmit are met
+            // TODO: Check if requirements to transmit are met, largely not important since the device just NACKs if there's something wrong
             /*switch (e.Write_Conditions)
             {
                 case Epsilon_Write_Command_Conditions.Always_Allowed:
@@ -74,6 +75,8 @@ namespace EpsilWin_LA2YUA
             txmessage.MessageID = (byte)e.Command_Index;
             txmessage.PayloadLength = e.Payload_Size;
 
+            // check if it's a read or write command
+            // 
             if (e.ReadWrite == EpsilonCommandAccessType.Read)
             { 
                 byte[] tmp = new byte[txmessage.PayloadLength];
@@ -95,6 +98,7 @@ namespace EpsilWin_LA2YUA
             }
 
             // special case: alarm read requires a bit to be set
+            // to determine if 0.1 or 1ppb resolution is available
             if (command == EpsilonCommandsIndex.Alarm_Limits_Read)
             {
                 txmessage.Payload[4] |= 0b10000000;
@@ -752,7 +756,11 @@ namespace EpsilWin_LA2YUA
                     }
                     else if (!epsilondevice.ProcessRXCommand(currentmessage))
                     {
-                        //e.Command_Index = EpsilonCommandsIndex.UNKNOWN_COMMAND;
+                        //sb.AppendFormat("Receiver: Decode failed for message\n");
+                        if (e.ReadWrite == EpsilonCommandAccessType.Read)
+                        {
+                            e.Command_Index = EpsilonCommandsIndex.DECODE_FAILED;
+                        }
                     }
 
                     //UInt32 currentlong;
@@ -813,6 +821,10 @@ namespace EpsilWin_LA2YUA
                                 case EpsilonCommandsIndex.Manual_Second_Write:
                                     button2_Set_Second_Step.BackColor = Color.LightGreen;
                                     break;
+                                case EpsilonCommandsIndex.GPS_Init_Time_Write:
+                                    button2.BackColor = Color.LightGreen;
+                                    button3.BackColor = Color.LightGreen;
+                                    break;
 
                             }
                             break;
@@ -849,10 +861,21 @@ namespace EpsilWin_LA2YUA
                             break;
                         case EpsilonCommandsIndex.Manual_Time_Read: // manual time
                             dateTimePicker2.Value = epsilondevice.ManualTimeSetting.ManualTime;
+                            dateTimePicker2.MaxDate = epsilondevice.ManualTimeSetting.maximumtime;
+                            dateTimePicker2.MinDate = epsilondevice.ManualTimeSetting.minimumtime;
                             dateTimePicker2.Enabled = true;
                             button20_Get_Manual_Time.BackColor = Color.LightGreen;
                             button17_Set_Man_Time.Enabled = true;
                             button16_Set_Time_Now.Enabled = true;
+                            break;
+                        case EpsilonCommandsIndex.GPS_Init_Time_Read: // manual time
+                            dateTimePicker1_GPS_Time.MinDate = epsilondevice.GPSTimeInit.minimumtime;
+                            dateTimePicker1_GPS_Time.MaxDate = epsilondevice.GPSTimeInit.maximumtime;
+                            dateTimePicker1_GPS_Time.Value = epsilondevice.GPSTimeInit.ManualTime;
+                            dateTimePicker1_GPS_Time.Enabled = true;
+                            button1.BackColor = Color.LightGreen;
+                            button2.Enabled = true;
+                            button3.Enabled = true;
                             break;
                         case EpsilonCommandsIndex.Force_Holdover_Read: // Forced Holdover
                             checkBox2.CheckState = epsilondevice.Forced_Holdover.Forced_Holdover == false ? CheckState.Unchecked : CheckState.Checked;
@@ -893,21 +916,21 @@ namespace EpsilWin_LA2YUA
                             button12_Set_Alarm_Limit.Enabled = true;
                             break;
                         case EpsilonCommandsIndex.Display_Read:// Display
-                            switch (epsilondevice.TOD_Information.CurrentDisplayFormat)
+                            switch (epsilondevice.DisplayInfo.GetDisplayMode)
                             {
-                                case EpsilonTODMessage.TODFormat.TOD_Format_1:
+                                case EpsilonDisplay.DisplayMode.TOD_Format_1:
                                     radioButton1.Select();
                                     break;
-                                case EpsilonTODMessage.TODFormat.TOD_Format_2:
+                                case EpsilonDisplay.DisplayMode.TOD_Format_2:
                                     radioButton2.Select();
                                     break;
-                                case EpsilonTODMessage.TODFormat.TOD_Format_3:
+                                case EpsilonDisplay.DisplayMode.TOD_Format_3:
                                     radioButton3.Select();
                                     break;
-                                case EpsilonTODMessage.TODFormat.TOD_Format_4:
+                                case EpsilonDisplay.DisplayMode.TOD_Format_4:
                                     radioButton4.Select();
                                     break;
-                                case EpsilonTODMessage.TODFormat.TOD_Format_5:
+                                case EpsilonDisplay.DisplayMode.TOD_Format_5:
                                     radioButton5.Select();
                                     break;
                             }
@@ -1069,6 +1092,12 @@ namespace EpsilWin_LA2YUA
                             {
                                 sb.AppendFormat("Received NACK for unknown command {0}, the error was: {1}\n", currentmessage.Payload[0], errortype);
                             }
+                            break;
+                        case EpsilonCommandsIndex.DECODE_FAILED:
+                            sb.AppendFormat("Decode failed for {0} {1} (command may not be supported)\n",
+                                    e.ReadWrite == EpsilonCommandAccessType.Read ? "Read" : "Write",
+                                    e.FriendlyName);
+                                    //(int)e.Command_Index);
                             break;
                         default: // unknown handler message
                             //Epsilon_Command_Info e2;
@@ -1269,6 +1298,7 @@ namespace EpsilWin_LA2YUA
             button4_Get_TOD_Int.PerformClick();
             button9_Read_GPS.PerformClick();
             button6__Get_Remote.PerformClick();
+            button1.PerformClick();
 
             // put tabcontrol back to the old tab
             tabControl1.SelectTab(oldindex);
@@ -1707,7 +1737,7 @@ namespace EpsilWin_LA2YUA
             Write_Manual_Date(time);
         }
 
-        private void Write_Manual_Date(DateTime time)
+        private void Write_Manual_Date(DateTime time, EpsilonCommandsIndex ep = EpsilonCommandsIndex.Manual_Time_Write)
         {
             EpsilonManualTOD tod = new EpsilonManualTOD();
 
@@ -1715,7 +1745,7 @@ namespace EpsilWin_LA2YUA
 
             tod.Serialize(out List<byte> payload);
 
-            Epsilon_Issue_Command(EpsilonCommandsIndex.Manual_Time_Write, payload);
+            Epsilon_Issue_Command(ep, payload);
         }
 
         private void button2_Click_1(object sender, EventArgs e)
@@ -1803,17 +1833,52 @@ namespace EpsilWin_LA2YUA
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
-            epsilondevice.GPS_Info.GPS_Position.Latitude = (double)numericUpDown2.Value;
+            //epsilondevice.GPS_Info.GPS_Position.Latitude = (double)numericUpDown2.Value;
         }
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            epsilondevice.GPS_Info.GPS_Position.Longitude = (double)numericUpDown3.Value;
+            //epsilondevice.GPS_Info.GPS_Position.Longitude = (double)numericUpDown3.Value;
         }
 
         private void numericUpDown4_ValueChanged(object sender, EventArgs e)
         {
-            epsilondevice.GPS_Info.GPS_Position.Altitude = (double)numericUpDown4.Value;
+            //epsilondevice.GPS_Info.GPS_Position.Altitude = (double)numericUpDown4.Value;
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.BackColor = Color.Orange;
+
+            Epsilon_Issue_Command(EpsilonCommandsIndex.GPS_Init_Time_Read);
+
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.BackColor = Color.Orange;
+
+
+
+
+            DateTime time = dateTimePicker2.Value;
+
+            Write_Manual_Date(time, EpsilonCommandsIndex.GPS_Init_Time_Write);
+        }
+
+        private void button2_Click_2(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.BackColor = Color.Orange;
+
+
+
+
+            DateTime time = DateTime.UtcNow.AddSeconds(1);
+
+            Write_Manual_Date(time, EpsilonCommandsIndex.GPS_Init_Time_Write);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace EpsilWin_LA2YUA
 
         // request a read of any command (command must be listed in the command list)
         // payload is optional for read commands
-        void Epsilon_Issue_Command(EpsilonCommandsIndex command, List<byte> payload = null)
+        void Epsilon_Issue_Command(EpsilonCommandsIndex command, List<byte> payload = null, List<EpsilonCommandsIndex> queuedcommands = null)
         {
             // look up command information
             EpsilonCommandInfo e;
@@ -64,6 +64,12 @@ namespace EpsilWin_LA2YUA
                 throw new Exception("Command lookup returned wrong command ID. World is upside down.");
             }
 
+           // attempt to handle recursion
+           if (queuedcommands == null)
+            {
+                queuedcommands = new List<EpsilonCommandsIndex>();
+            }
+
            // attempt to resolve read requirements to get correct parsing
            // may just cause a stack overflow :)
             if (e.ReadRequirements.Count > 0)
@@ -71,9 +77,11 @@ namespace EpsilWin_LA2YUA
                 foreach(EpsilonCommandsIndex cmd in e.ReadRequirements)
                 {
                     // check the epsilon device context list if we already have a valid data set for the commdn
-                    if (!epsilondevice.ValidCommands.Contains(cmd))
+                    if (!epsilondevice.ValidCommands.Contains(cmd) &&
+                        !queuedcommands.Contains(cmd))
                     {
-                        Epsilon_Issue_Command(cmd);
+                        queuedcommands.Add(cmd);
+                        Epsilon_Issue_Command(cmd, null, queuedcommands);
                     }
                 }
             }

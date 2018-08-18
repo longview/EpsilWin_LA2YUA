@@ -47,12 +47,23 @@
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.dateTimePicker1_GPS_Time = new System.Windows.Forms.DateTimePicker();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.button5_Set_Remote = new System.Windows.Forms.Button();
             this.button6__Get_Remote = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.button7_Reset = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.button4_Set_Freq_Manual = new System.Windows.Forms.Button();
+            this.button5_Get_Freq_Manual = new System.Windows.Forms.Button();
+            this.numericUpDown9 = new System.Windows.Forms.NumericUpDown();
             this.radioButton7_minus = new System.Windows.Forms.RadioButton();
             this.radioButton6_plus = new System.Windows.Forms.RadioButton();
             this.numericUpDown11_Loc_Minutes = new System.Windows.Forms.NumericUpDown();
@@ -61,7 +72,6 @@
             this.button4_Get_Step_Seconds = new System.Windows.Forms.Button();
             this.label32 = new System.Windows.Forms.Label();
             this.label30 = new System.Windows.Forms.Label();
-            this.button7_Reset = new System.Windows.Forms.Button();
             this.label28 = new System.Windows.Forms.Label();
             this.button23_Set_1PPS_Ph = new System.Windows.Forms.Button();
             this.button24_Get_1PPS_Phase = new System.Windows.Forms.Button();
@@ -144,16 +154,6 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1_Status_Auto = new System.Windows.Forms.Timer(this.components);
             this.timer1_Time_Timeout = new System.Windows.Forms.Timer(this.components);
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
-            this.dateTimePicker1_GPS_Time = new System.Windows.Forms.DateTimePicker();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label29 = new System.Windows.Forms.Label();
-            this.button4_Set_Freq_Manual = new System.Windows.Forms.Button();
-            this.button5_Get_Freq_Manual = new System.Windows.Forms.Button();
-            this.numericUpDown9 = new System.Windows.Forms.NumericUpDown();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -166,8 +166,10 @@
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2_Version_Info)).BeginInit();
             this.tabPage2.SuspendLayout();
+            this.groupBox9.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.groupBox7.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown11_Loc_Minutes)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10_Loc_Hours)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
@@ -183,8 +185,6 @@
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tabPage3.SuspendLayout();
-            this.groupBox9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -223,7 +223,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(974, 581);
+            this.tabPage1.Size = new System.Drawing.Size(974, 547);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Status and Version";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -401,6 +401,74 @@
             this.tabPage2.Text = "Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.label5);
+            this.groupBox9.Controls.Add(this.button1);
+            this.groupBox9.Controls.Add(this.button2);
+            this.groupBox9.Controls.Add(this.button3);
+            this.groupBox9.Controls.Add(this.dateTimePicker1_GPS_Time);
+            this.groupBox9.Location = new System.Drawing.Point(6, 439);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(330, 100);
+            this.groupBox9.TabIndex = 7;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Manual GPS Time (Series 1 and 3)";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 45);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(163, 26);
+            this.label5.TabIndex = 29;
+            this.label5.Text = "Note:\r\nThis command will fail on series 2";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(169, 19);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(37, 23);
+            this.button1.TabIndex = 22;
+            this.button1.Text = "Get";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // button2
+            // 
+            this.button2.Enabled = false;
+            this.button2.Location = new System.Drawing.Point(255, 19);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(69, 23);
+            this.button2.TabIndex = 21;
+            this.button2.Text = "Set Now";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click_2);
+            // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(212, 19);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(37, 23);
+            this.button3.TabIndex = 20;
+            this.button3.Text = "Set";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
+            // dateTimePicker1_GPS_Time
+            // 
+            this.dateTimePicker1_GPS_Time.CustomFormat = "yyyy-MM-dd hh:mm:ss";
+            this.dateTimePicker1_GPS_Time.Enabled = false;
+            this.dateTimePicker1_GPS_Time.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePicker1_GPS_Time.Location = new System.Drawing.Point(6, 19);
+            this.dateTimePicker1_GPS_Time.MaxDate = new System.DateTime(2127, 12, 31, 0, 0, 0, 0);
+            this.dateTimePicker1_GPS_Time.MinDate = new System.DateTime(1992, 1, 1, 0, 0, 0, 0);
+            this.dateTimePicker1_GPS_Time.Name = "dateTimePicker1_GPS_Time";
+            this.dateTimePicker1_GPS_Time.Size = new System.Drawing.Size(151, 20);
+            this.dateTimePicker1_GPS_Time.TabIndex = 11;
+            this.dateTimePicker1_GPS_Time.Value = new System.DateTime(1992, 1, 1, 0, 0, 0, 0);
+            // 
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.button5_Set_Remote);
@@ -459,6 +527,18 @@
             this.label3.TabIndex = 0;
             this.label3.Text = "Enable this to use write commands";
             // 
+            // button7_Reset
+            // 
+            this.button7_Reset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button7_Reset.BackColor = System.Drawing.Color.OrangeRed;
+            this.button7_Reset.Location = new System.Drawing.Point(6, 89);
+            this.button7_Reset.Name = "button7_Reset";
+            this.button7_Reset.Size = new System.Drawing.Size(257, 23);
+            this.button7_Reset.TabIndex = 27;
+            this.button7_Reset.Text = "Clock Reset";
+            this.button7_Reset.UseVisualStyleBackColor = false;
+            this.button7_Reset.Click += new System.EventHandler(this.button7_Click);
+            // 
             // groupBox7
             // 
             this.groupBox7.Controls.Add(this.label29);
@@ -495,6 +575,56 @@
             this.groupBox7.TabIndex = 5;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Misc";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(4, 222);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(55, 13);
+            this.label29.TabIndex = 40;
+            this.label29.Text = "Freq [ppb]";
+            // 
+            // button4_Set_Freq_Manual
+            // 
+            this.button4_Set_Freq_Manual.Enabled = false;
+            this.button4_Set_Freq_Manual.Location = new System.Drawing.Point(226, 220);
+            this.button4_Set_Freq_Manual.Name = "button4_Set_Freq_Manual";
+            this.button4_Set_Freq_Manual.Size = new System.Drawing.Size(37, 23);
+            this.button4_Set_Freq_Manual.TabIndex = 39;
+            this.button4_Set_Freq_Manual.Text = "Set";
+            this.button4_Set_Freq_Manual.UseVisualStyleBackColor = true;
+            this.button4_Set_Freq_Manual.Click += new System.EventHandler(this.button4_Click_2);
+            // 
+            // button5_Get_Freq_Manual
+            // 
+            this.button5_Get_Freq_Manual.Location = new System.Drawing.Point(183, 220);
+            this.button5_Get_Freq_Manual.Name = "button5_Get_Freq_Manual";
+            this.button5_Get_Freq_Manual.Size = new System.Drawing.Size(37, 23);
+            this.button5_Get_Freq_Manual.TabIndex = 38;
+            this.button5_Get_Freq_Manual.Text = "Get";
+            this.button5_Get_Freq_Manual.UseVisualStyleBackColor = true;
+            this.button5_Get_Freq_Manual.Click += new System.EventHandler(this.button5_Click_1);
+            // 
+            // numericUpDown9
+            // 
+            this.numericUpDown9.DecimalPlaces = 3;
+            this.numericUpDown9.Enabled = false;
+            this.numericUpDown9.Location = new System.Drawing.Point(97, 220);
+            this.numericUpDown9.Maximum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.numericUpDown9.Minimum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDown9.Name = "numericUpDown9";
+            this.numericUpDown9.Size = new System.Drawing.Size(75, 20);
+            this.numericUpDown9.TabIndex = 37;
+            this.numericUpDown9.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // radioButton7_minus
             // 
@@ -595,18 +725,6 @@
             this.label30.TabIndex = 28;
             this.label30.Text = "Note:\r\nThe Set Now button sets the time to UTC as provided\r\n by the OS clock";
             // 
-            // button7_Reset
-            // 
-            this.button7_Reset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button7_Reset.BackColor = System.Drawing.Color.OrangeRed;
-            this.button7_Reset.Location = new System.Drawing.Point(6, 89);
-            this.button7_Reset.Name = "button7_Reset";
-            this.button7_Reset.Size = new System.Drawing.Size(257, 23);
-            this.button7_Reset.TabIndex = 27;
-            this.button7_Reset.Text = "Clock Reset";
-            this.button7_Reset.UseVisualStyleBackColor = false;
-            this.button7_Reset.Click += new System.EventHandler(this.button7_Click);
-            // 
             // label28
             // 
             this.label28.AutoSize = true;
@@ -681,9 +799,9 @@
             this.label26.AutoSize = true;
             this.label26.Location = new System.Drawing.Point(6, 109);
             this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(78, 13);
+            this.label26.Size = new System.Drawing.Size(68, 13);
             this.label26.TabIndex = 18;
-            this.label26.Text = "Manual Setting";
+            this.label26.Text = "Manual Time";
             // 
             // button18_Set_Holdover
             // 
@@ -1413,7 +1531,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(974, 581);
+            this.tabPage3.Size = new System.Drawing.Size(974, 547);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Information";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1554,124 +1672,6 @@
             this.timer1_Time_Timeout.Interval = 1200;
             this.timer1_Time_Timeout.Tick += new System.EventHandler(this.timer1_Time_Timeout_Tick);
             // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.label5);
-            this.groupBox9.Controls.Add(this.button1);
-            this.groupBox9.Controls.Add(this.button2);
-            this.groupBox9.Controls.Add(this.button3);
-            this.groupBox9.Controls.Add(this.dateTimePicker1_GPS_Time);
-            this.groupBox9.Location = new System.Drawing.Point(6, 439);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(330, 100);
-            this.groupBox9.TabIndex = 7;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "Manual GPS Time (Series 1 and 3)";
-            // 
-            // dateTimePicker1_GPS_Time
-            // 
-            this.dateTimePicker1_GPS_Time.CustomFormat = "yyyy-MM-dd hh:mm:ss";
-            this.dateTimePicker1_GPS_Time.Enabled = false;
-            this.dateTimePicker1_GPS_Time.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker1_GPS_Time.Location = new System.Drawing.Point(6, 19);
-            this.dateTimePicker1_GPS_Time.MaxDate = new System.DateTime(2127, 12, 31, 0, 0, 0, 0);
-            this.dateTimePicker1_GPS_Time.MinDate = new System.DateTime(1992, 1, 1, 0, 0, 0, 0);
-            this.dateTimePicker1_GPS_Time.Name = "dateTimePicker1_GPS_Time";
-            this.dateTimePicker1_GPS_Time.Size = new System.Drawing.Size(151, 20);
-            this.dateTimePicker1_GPS_Time.TabIndex = 11;
-            this.dateTimePicker1_GPS_Time.Value = new System.DateTime(1992, 1, 1, 0, 0, 0, 0);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(169, 19);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(37, 23);
-            this.button1.TabIndex = 22;
-            this.button1.Text = "Get";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
-            // 
-            // button2
-            // 
-            this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(255, 19);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(69, 23);
-            this.button2.TabIndex = 21;
-            this.button2.Text = "Set Now";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click_2);
-            // 
-            // button3
-            // 
-            this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(212, 19);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(37, 23);
-            this.button3.TabIndex = 20;
-            this.button3.Text = "Set";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click_1);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 45);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(163, 26);
-            this.label5.TabIndex = 29;
-            this.label5.Text = "Note:\r\nThis command will fail on series 2";
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(4, 222);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(55, 13);
-            this.label29.TabIndex = 40;
-            this.label29.Text = "Freq [ppb]";
-            // 
-            // button4_Set_Freq_Manual
-            // 
-            this.button4_Set_Freq_Manual.Enabled = false;
-            this.button4_Set_Freq_Manual.Location = new System.Drawing.Point(226, 220);
-            this.button4_Set_Freq_Manual.Name = "button4_Set_Freq_Manual";
-            this.button4_Set_Freq_Manual.Size = new System.Drawing.Size(37, 23);
-            this.button4_Set_Freq_Manual.TabIndex = 39;
-            this.button4_Set_Freq_Manual.Text = "Set";
-            this.button4_Set_Freq_Manual.UseVisualStyleBackColor = true;
-            this.button4_Set_Freq_Manual.Click += new System.EventHandler(this.button4_Click_2);
-            // 
-            // button5_Get_Freq_Manual
-            // 
-            this.button5_Get_Freq_Manual.Location = new System.Drawing.Point(183, 220);
-            this.button5_Get_Freq_Manual.Name = "button5_Get_Freq_Manual";
-            this.button5_Get_Freq_Manual.Size = new System.Drawing.Size(37, 23);
-            this.button5_Get_Freq_Manual.TabIndex = 38;
-            this.button5_Get_Freq_Manual.Text = "Get";
-            this.button5_Get_Freq_Manual.UseVisualStyleBackColor = true;
-            this.button5_Get_Freq_Manual.Click += new System.EventHandler(this.button5_Click_1);
-            // 
-            // numericUpDown9
-            // 
-            this.numericUpDown9.DecimalPlaces = 3;
-            this.numericUpDown9.Enabled = false;
-            this.numericUpDown9.Location = new System.Drawing.Point(97, 220);
-            this.numericUpDown9.Maximum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.numericUpDown9.Minimum = new decimal(new int[] {
-            50,
-            0,
-            0,
-            -2147483648});
-            this.numericUpDown9.Name = "numericUpDown9";
-            this.numericUpDown9.Size = new System.Drawing.Size(75, 20);
-            this.numericUpDown9.TabIndex = 37;
-            this.numericUpDown9.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1707,10 +1707,13 @@
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2_Version_Info)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown11_Loc_Minutes)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10_Loc_Hours)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
@@ -1730,9 +1733,6 @@
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.tabPage3.ResumeLayout(false);
-            this.groupBox9.ResumeLayout(false);
-            this.groupBox9.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

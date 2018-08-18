@@ -903,7 +903,12 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                
+
+                if (currentmessage.Payload[0] > 1)
+                {
+                    DataValid = false;
+                    return false;
+                }
 
                 Forced_Holdover = currentmessage.Payload[0] == 1 ? false : true;
                 DataValid = true;
@@ -934,7 +939,12 @@ namespace EpsilWin_LA2YUA
                 {
                     return false;
                 }
-                
+
+                if (currentmessage.Payload[0] > 1)
+                {
+                    DataValid = false;
+                    return false;
+                }
 
                 RemoteAllowed = currentmessage.Payload[0] == 1 ? false : true;
                 DataValid = true;
@@ -1674,6 +1684,13 @@ namespace EpsilWin_LA2YUA
                     (Int32)currentmessage.Payload[11] << 8 | (Int32)currentmessage.Payload[12];
 
                 GPS_Position_ = new GeoCoordinate(GPS_Latitude_ms / GPS_Conversion_Factor, GPS_Longtitude_ms / GPS_Conversion_Factor, GPS_Altitude_cm / 100.0d);
+
+
+                if (currentmessage.Payload[18] > 1)
+                {
+                    DataValid = false;
+                    return false;
+                }
 
                 Time_Reference = currentmessage.Payload[18] == 1 ?
                     GPSTimeReferenceModes.Time_Mode_UTC : GPSTimeReferenceModes.Time_Mode_GPS;

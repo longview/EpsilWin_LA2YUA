@@ -245,7 +245,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox2);
             this.splitContainer1.Panel2MinSize = 256;
-            this.splitContainer1.Size = new System.Drawing.Size(962, 569);
+            this.splitContainer1.Size = new System.Drawing.Size(962, 535);
             this.splitContainer1.SplitterDistance = 637;
             this.splitContainer1.TabIndex = 14;
             // 
@@ -259,7 +259,7 @@
             this.groupBox1.Controls.Add(this.dataGridView1_Status_Info);
             this.groupBox1.Location = new System.Drawing.Point(3, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(631, 561);
+            this.groupBox1.Size = new System.Drawing.Size(631, 527);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Status Info";
@@ -302,7 +302,7 @@
             this.dataGridView1_Status_Info.Location = new System.Drawing.Point(6, 54);
             this.dataGridView1_Status_Info.Name = "dataGridView1_Status_Info";
             this.dataGridView1_Status_Info.ReadOnly = true;
-            this.dataGridView1_Status_Info.Size = new System.Drawing.Size(619, 501);
+            this.dataGridView1_Status_Info.Size = new System.Drawing.Size(619, 467);
             this.dataGridView1_Status_Info.TabIndex = 0;
             this.dataGridView1_Status_Info.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
@@ -336,7 +336,7 @@
             this.groupBox2.Controls.Add(this.dataGridView2_Version_Info);
             this.groupBox2.Location = new System.Drawing.Point(3, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(315, 562);
+            this.groupBox2.Size = new System.Drawing.Size(315, 528);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Version Info";
@@ -367,7 +367,7 @@
             this.dataGridView2_Version_Info.Location = new System.Drawing.Point(6, 54);
             this.dataGridView2_Version_Info.Name = "dataGridView2_Version_Info";
             this.dataGridView2_Version_Info.ReadOnly = true;
-            this.dataGridView2_Version_Info.Size = new System.Drawing.Size(303, 502);
+            this.dataGridView2_Version_Info.Size = new System.Drawing.Size(303, 468);
             this.dataGridView2_Version_Info.TabIndex = 0;
             // 
             // dataGridViewTextBoxColumn1
@@ -1545,7 +1545,7 @@
             this.richTextBox1.Location = new System.Drawing.Point(6, 6);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(962, 569);
+            this.richTextBox1.Size = new System.Drawing.Size(962, 535);
             this.richTextBox1.TabIndex = 8;
             this.richTextBox1.Text = "";
             // 

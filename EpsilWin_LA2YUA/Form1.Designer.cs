@@ -29,6 +29,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -141,6 +149,10 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.label34 = new System.Windows.Forms.Label();
+            this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -154,6 +166,8 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1_Status_Auto = new System.Windows.Forms.Timer(this.components);
             this.timer1_Time_Timeout = new System.Windows.Forms.Timer(this.components);
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.timer_Chart_Bury = new System.Windows.Forms.Timer(this.components);
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -185,6 +199,9 @@
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -211,6 +228,7 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Location = new System.Drawing.Point(12, 27);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -1066,7 +1084,7 @@
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(118, 20);
+            this.label33.Location = new System.Drawing.Point(128, 20);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(193, 13);
             this.label33.TabIndex = 8;
@@ -1099,10 +1117,10 @@
             this.radioButton5.Enabled = false;
             this.radioButton5.Location = new System.Drawing.Point(6, 110);
             this.radioButton5.Name = "radioButton5";
-            this.radioButton5.Size = new System.Drawing.Size(143, 17);
+            this.radioButton5.Size = new System.Drawing.Size(231, 17);
             this.radioButton5.TabIndex = 4;
             this.radioButton5.TabStop = true;
-            this.radioButton5.Text = "MJD integer /hh/mn/sec";
+            this.radioButton5.Text = "5: MJD integer /hh/mn/sec; Int days + ToD";
             this.radioButton5.UseVisualStyleBackColor = true;
             // 
             // radioButton4
@@ -1111,10 +1129,10 @@
             this.radioButton4.Enabled = false;
             this.radioButton4.Location = new System.Drawing.Point(6, 87);
             this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(152, 17);
+            this.radioButton4.Size = new System.Drawing.Size(258, 17);
             this.radioButton4.TabIndex = 3;
             this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Modified Julian Date (MJD)";
+            this.radioButton4.Text = "4: Modified Julian Date (MJD); Floating point days";
             this.radioButton4.UseVisualStyleBackColor = true;
             // 
             // radioButton3
@@ -1123,10 +1141,10 @@
             this.radioButton3.Enabled = false;
             this.radioButton3.Location = new System.Drawing.Point(6, 64);
             this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(112, 17);
+            this.radioButton3.Size = new System.Drawing.Size(124, 17);
             this.radioButton3.TabIndex = 2;
             this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Day of year / Year";
+            this.radioButton3.Text = "3: Day of year / Year";
             this.radioButton3.UseVisualStyleBackColor = true;
             // 
             // radioButton2
@@ -1135,10 +1153,10 @@
             this.radioButton2.Enabled = false;
             this.radioButton2.Location = new System.Drawing.Point(6, 41);
             this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(106, 17);
+            this.radioButton2.Size = new System.Drawing.Size(118, 17);
             this.radioButton2.TabIndex = 1;
             this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "Month/Day/Year";
+            this.radioButton2.Text = "2: Month/Day/Year";
             this.radioButton2.UseVisualStyleBackColor = true;
             // 
             // radioButton1
@@ -1147,10 +1165,10 @@
             this.radioButton1.Enabled = false;
             this.radioButton1.Location = new System.Drawing.Point(6, 18);
             this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(106, 17);
+            this.radioButton1.Size = new System.Drawing.Size(118, 17);
             this.radioButton1.TabIndex = 0;
             this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Day/Month/Year";
+            this.radioButton1.Text = "1: Day/Month/Year";
             this.radioButton1.UseVisualStyleBackColor = true;
             // 
             // groupBox4
@@ -1574,6 +1592,115 @@
             this.richTextBox1.TabIndex = 8;
             this.richTextBox1.Text = "";
             // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.checkBox4);
+            this.tabPage4.Controls.Add(this.label34);
+            this.tabPage4.Controls.Add(this.chart2);
+            this.tabPage4.Controls.Add(this.chart1);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(974, 547);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Charts";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(875, 528);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(75, 13);
+            this.label34.TabIndex = 2;
+            this.label34.Text = "Zoom Level: 0";
+            // 
+            // chart2
+            // 
+            this.chart2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chart2.BorderlineWidth = 2;
+            chartArea5.AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            chartArea5.AxisX.LabelStyle.Format = "HH:mm:ss";
+            chartArea5.AxisX.MajorTickMark.Interval = 0D;
+            chartArea5.AxisX.MajorTickMark.IntervalOffset = 0D;
+            chartArea5.AxisX.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            chartArea5.AxisX.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            chartArea5.AxisY.IsStartedFromZero = false;
+            chartArea5.AxisY.LabelStyle.Interval = 0D;
+            chartArea5.AxisY.LabelStyle.IntervalOffset = 0D;
+            chartArea5.AxisY.LabelStyle.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea5.AxisY.LabelStyle.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea5.AxisY.MajorGrid.Interval = 0D;
+            chartArea5.AxisY.MajorGrid.IntervalOffset = 0D;
+            chartArea5.AxisY.MajorGrid.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea5.AxisY.MajorGrid.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea5.AxisY.MajorTickMark.Interval = 0D;
+            chartArea5.AxisY.MajorTickMark.IntervalOffset = 0D;
+            chartArea5.AxisY.MajorTickMark.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea5.AxisY.MajorTickMark.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Auto;
+            chartArea5.AxisY.Minimum = 0D;
+            chartArea5.AxisY.MinorTickMark.Enabled = true;
+            chartArea5.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea5);
+            legend5.Name = "Legend1";
+            this.chart2.Legends.Add(legend5);
+            this.chart2.Location = new System.Drawing.Point(6, 152);
+            this.chart2.Name = "chart2";
+            this.chart2.Size = new System.Drawing.Size(962, 389);
+            this.chart2.TabIndex = 1;
+            this.chart2.Text = "chart2";
+            title5.Name = "Title1";
+            title5.Text = "Satellite SNR";
+            this.chart2.Titles.Add(title5);
+            this.chart2.Click += new System.EventHandler(this.chart2_Click);
+            // 
+            // chart1
+            // 
+            this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            chartArea6.AxisX.LabelStyle.Format = "HH:mm:ss";
+            chartArea6.AxisX.MajorGrid.IntervalOffset = 0D;
+            chartArea6.AxisX.MajorGrid.IntervalOffsetType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            chartArea6.AxisX.MajorGrid.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Seconds;
+            chartArea6.AxisY.IntervalAutoMode = System.Windows.Forms.DataVisualization.Charting.IntervalAutoMode.VariableCount;
+            chartArea6.AxisY.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number;
+            chartArea6.AxisY.LabelStyle.Interval = 0D;
+            chartArea6.AxisY.LabelStyle.IntervalOffset = 0D;
+            chartArea6.AxisY.LabelStyle.IsEndLabelVisible = false;
+            chartArea6.AxisY.MajorGrid.Interval = 0D;
+            chartArea6.AxisY.MajorGrid.IntervalOffset = 0D;
+            chartArea6.AxisY.Maximum = 8D;
+            chartArea6.AxisY.Minimum = 0D;
+            chartArea6.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea6);
+            legend6.Name = "Legend1";
+            this.chart1.Legends.Add(legend6);
+            this.chart1.Location = new System.Drawing.Point(6, 6);
+            this.chart1.Name = "chart1";
+            series5.BorderWidth = 3;
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series5.CustomProperties = "EmptyPointValue=Zero";
+            series5.Legend = "Legend1";
+            series5.Name = "Tracked";
+            series5.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            series6.BorderWidth = 3;
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StepLine;
+            series6.Legend = "Legend1";
+            series6.Name = "Visible";
+            series6.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            this.chart1.Series.Add(series5);
+            this.chart1.Series.Add(series6);
+            this.chart1.Size = new System.Drawing.Size(962, 140);
+            this.chart1.TabIndex = 0;
+            this.chart1.Text = "chart1";
+            title6.Name = "Title1";
+            title6.Text = "No. of satellites";
+            this.chart1.Titles.Add(title6);
+            // 
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
@@ -1697,6 +1824,22 @@
             this.timer1_Time_Timeout.Interval = 1200;
             this.timer1_Time_Timeout.Tick += new System.EventHandler(this.timer1_Time_Timeout_Tick);
             // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Location = new System.Drawing.Point(878, 508);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(82, 17);
+            this.checkBox4.TabIndex = 3;
+            this.checkBox4.Text = "Show Dead";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
+            // 
+            // timer_Chart_Bury
+            // 
+            this.timer_Chart_Bury.Interval = 10000;
+            this.timer_Chart_Bury.Tick += new System.EventHandler(this.timer_Chart_Bury_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1758,6 +1901,10 @@
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.tabPage3.ResumeLayout(false);
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1890,6 +2037,12 @@
         private System.Windows.Forms.Button button4_Set_Freq_Manual;
         private System.Windows.Forms.Button button5_Get_Freq_Manual;
         private System.Windows.Forms.NumericUpDown numericUpDown9;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.CheckBox checkBox4;
+        private System.Windows.Forms.Timer timer_Chart_Bury;
     }
 }
 

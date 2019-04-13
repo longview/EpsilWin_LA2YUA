@@ -405,7 +405,9 @@ namespace EpsilWin_LA2YUA
                 TOD_Format_5 = 197,
             }
 
-            public bool ProcessMessage(EpsilonSerialMessage currentmessage, ReadOnlyDictionary<int, EpsilonCommandInfo> info)
+            // TODO: add lookup of local time offset in local time mode
+            public bool ProcessMessage(EpsilonSerialMessage currentmessage, ReadOnlyDictionary<int, EpsilonCommandInfo> info,
+                EpsilonLocalTimeOffset localtime = null)
             {
                 DataValid = true;
                 DateTime receivedtime = new DateTime();
@@ -1092,6 +1094,7 @@ namespace EpsilWin_LA2YUA
             }
         }
 
+
         // class representing all information about a device
         class EpsilonDeviceContext
         {
@@ -1242,7 +1245,7 @@ namespace EpsilWin_LA2YUA
                     case EpsilonCommandsIndex.TOD_Format_3:
                     case EpsilonCommandsIndex.TOD_Format_4:
                     case EpsilonCommandsIndex.TOD_Format_5:
-                        retval = TOD_Information.ProcessMessage(currentmessage, Epsilon_Command_List);
+                        retval = TOD_Information.ProcessMessage(currentmessage, Epsilon_Command_List, Local_Time_Offset);
                         break;
                     case EpsilonCommandsIndex.TOD_Period_Read:
                         retval = TOD_Output_Period.ProcessMessage(currentmessage);
@@ -1305,9 +1308,9 @@ namespace EpsilWin_LA2YUA
 
                 e = new EpsilonCommandInfo();
                 e.Command_Index = EpsilonCommandsIndex.TOD_Format_4;
-                e.Payload_Size = 8;
+                e.Payload_Size = 9;
                 e.ReadWrite = EpsilonCommandAccessType.Read;
-                e.FriendlyName = "TOD Format 4 (MJD Double)";
+                e.FriendlyName = "TOD Format 4 (MJD: Days, ToD)";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
                 _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
@@ -1315,7 +1318,7 @@ namespace EpsilWin_LA2YUA
                 e.Command_Index = EpsilonCommandsIndex.TOD_Format_5;
                 e.Payload_Size = 8;
                 e.ReadWrite = EpsilonCommandAccessType.Read;
-                e.FriendlyName = "TOD Format 5 (MJD Integer)";
+                e.FriendlyName = "TOD Format 5 (MJD: Days + ToD)";
                 e.Write_Conditions = EpsilonCommandWriteConditions.Always_Allowed;
                 _Epsilon_Command_List.Add((int)e.Command_Index, e);
 
@@ -1715,6 +1718,7 @@ namespace EpsilWin_LA2YUA
 
                 // it looks like the data sheet swaps char 8 and 9 for this command
                 // yup it's definitely swapped
+                // maybe not???? WTF
 
                 Clock_Series_No = (byte)(currentmessage.Payload[9] & 0b00000011);
                 Power_24V = (currentmessage.Payload[9] & 0b00000100) > 0 ? PowerInputTypes.DCPower24V : PowerInputTypes.DCPower48V;
@@ -1958,7 +1962,9 @@ namespace EpsilWin_LA2YUA
             public GPSReceptionMode GPS_Position_Type;
             //private byte[] GPS_DATA; // 15 bytes of GPS data
             public List<SatelliteStatus> SatelliteList;
+            //public List<SatelliteStatus> SatelliteList_Raw;
             public int SatelliteList_Valid_Count;
+            public int SatelliteList_Tracked_Count;
             public UInt16 Standard_Deviation_1PPS; // ns deviation
             public Int32 GPS_Latitude_ms;
             public Int32 GPS_Longtitude_ms;
@@ -1977,8 +1983,10 @@ namespace EpsilWin_LA2YUA
             public EpsilonStatusMessageResponse()
             {
                 SatelliteList = new List<SatelliteStatus>(8);
+                //SatelliteList_Raw = new List<SatelliteStatus>(8);
                 GPS_Position = new GeoCoordinate();
                 SatelliteList_Valid_Count = 0;
+                SatelliteList_Tracked_Count = 0;
                 DataValid = false;
             }
 
@@ -2064,7 +2072,10 @@ namespace EpsilWin_LA2YUA
             private void _Set_GPS_Data(UInt16[] GPS_DATA_)
             {
                 SatelliteList_Valid_Count = 0;
+                SatelliteList_Tracked_Count = 0;
                 SatelliteList.Clear();
+                //SatelliteList_Raw.Clear();
+                int i = 0;
                 foreach (UInt16 b in GPS_DATA_)
                 {
                     SatelliteStatus s = new SatelliteStatus();
@@ -2073,7 +2084,7 @@ namespace EpsilWin_LA2YUA
                     s.Tracking = (lowerb & 0b1000000) == 0;
                     s.SatelliteNo = (byte)(lowerb & 0b01111111);
                     s.SNR = upperb;
-                    if (s.SatelliteNo != 0 && s.SNR > 0)
+                    if (s.SatelliteNo != 0 && s.SNR > 0 && s.SNR < 127)
                     {
                         s.Valid = true;
                         SatelliteList_Valid_Count++;
@@ -2082,12 +2093,23 @@ namespace EpsilWin_LA2YUA
                     {
                         s.Valid = false;
                     }
+
+                    if (s.SatelliteNo != 0)
+                    {
+                        SatelliteList_Tracked_Count++;
+                    }
+
+                    s.ChannelIndex = i;
+
                     SatelliteList.Add(s);
 
                     // sort list by satellite no. and tracking status
                     //SatelliteList.Sort((x, y) => x.SatelliteNo.CompareTo(y.Valid));
-                    SatelliteList = SatelliteList.OrderBy(o => o.Tracking).ThenBy(o => o.SatelliteNo).ToList();
+                    i++;
                 }
+
+                //SatelliteList = SatelliteList.OrderBy(o => o.Tracking).ThenBy(o => o.SatelliteNo).ToList();
+                //SatelliteList_Raw.AddRange(SatelliteList.ToArray());
             }
 
         };

@@ -10,6 +10,7 @@ using System.IO.Ports;
 using System.IO;
 using System.Device.Location;
 using System.Diagnostics;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace EpsilWin_LA2YUA
 {
@@ -20,8 +21,9 @@ namespace EpsilWin_LA2YUA
         {
             InitializeComponent();
 
-            string Version = "0.4";
-            string Date = "2018";
+            string Version = "0.4a";
+
+            string Date = "2018-2019";
 
             label1.Text = String.Format("LA2YUA Epsilon Clock Interface EC2S, version {0} - {1}", Version, Date);
             this.Text = label1.Text;
@@ -41,10 +43,70 @@ namespace EpsilWin_LA2YUA
 
             epsilondevice = new EpsilonDeviceContext();
 
+            chart1.MouseWheel += chart_MouseWheel;
+            chart2.MouseWheel += chart_MouseWheel;
+
         }
 
 
         EpsilonDeviceContext epsilondevice;
+
+
+        private void chart_MouseWheel(object sender, MouseEventArgs e)
+        {
+            var chart = (Chart)sender;
+            var xAxis = chart1.ChartAreas[0].AxisX;
+            //var yAxis = chart.ChartAreas[0].AxisY;
+
+            chart_zoom(e, xAxis, ref FZoomLevel1);
+
+            xAxis = chart2.ChartAreas[0].AxisX;
+            chart_zoom(e, xAxis, ref FZoomLevel2);
+
+            label34.Text = String.Format("Zoom Level: {0}", FZoomLevel1);
+        }
+
+        // https://stackoverflow.com/questions/13584061/how-to-enable-zooming-in-microsoft-chart-control-by-using-mouse-wheel/14542854
+        private static int FZoomLevel1 = 0;
+        private static int FZoomLevel2 = 0;
+        private static void chart_zoom(MouseEventArgs e, Axis xAxis, ref int FZoomLevel)
+        {
+            try
+            {
+                //Axis xAxis = chart1.ChartAreas[0].AxisX;
+                double xMin = xAxis.ScaleView.ViewMinimum;
+                double xMax = xAxis.ScaleView.ViewMaximum;
+                double xPixelPos = xAxis.PixelPositionToValue(e.Location.X);
+                var CZoomScale = 2;
+
+                if (e.Delta < 0 && FZoomLevel > 0)
+                {
+                    // Scrolled down, meaning zoom out
+                    if (--FZoomLevel <= 0)
+                    {
+                        FZoomLevel = 0;
+                        xAxis.ScaleView.ZoomReset();
+                    }
+                    else
+                    {
+                        double xStartPos = Math.Max(xPixelPos - (xPixelPos - xMin) * CZoomScale, 0);
+                        double xEndPos = Math.Min(xStartPos + (xMax - xMin) * CZoomScale, xAxis.Maximum);
+                        xAxis.ScaleView.Zoom(xStartPos, xEndPos);
+                    }
+                }
+                else if (e.Delta > 0)
+                {
+                    // Scrolled up, meaning zoom in
+                    double xStartPos = Math.Max(xPixelPos - (xPixelPos - xMin) / CZoomScale, 0);
+                    double xEndPos = Math.Min(xStartPos + (xMax - xMin) / CZoomScale, xAxis.Maximum);
+                    xAxis.ScaleView.Zoom(xStartPos, xEndPos);
+                    FZoomLevel++;
+                }
+            }
+            catch { }
+        }
+
+
 
         // request a read of any command (command must be listed in the command list)
         // payload is optional for read commands
@@ -380,6 +442,7 @@ namespace EpsilWin_LA2YUA
             public byte SNR;
             public byte SatelliteNo;
             public bool Valid;
+            public int ChannelIndex;
         }
 
         private void Update_Status(EpsilonStatusMessageResponse status)
@@ -420,12 +483,12 @@ namespace EpsilWin_LA2YUA
 
             dataGridView1_Status_Info.Rows.Add(new object[] { "Phase Limit",
                 status.Phase_Limit_Alarm ? "Phase Limit Alarm" :
-                "Phase Limit below alarm limit",
+                "Below Alarm Limit",
             status.Phase_Limit_Alarm ? "ERROR" : "OK"});
 
             dataGridView1_Status_Info.Rows.Add(new object[] { "Frequency Limit",
                 status.Frequency_Limit_Alarm ? "Limit Alarm or Holdover" :
-                "Frequency Limit below alarm limit",
+                "Below Alarm Limit",
             status.Frequency_Limit_Alarm ? "ERROR" : "OK"});
 
             dataGridView1_Status_Info.Rows.Add(new object[] { "Option Board",
@@ -447,7 +510,7 @@ namespace EpsilWin_LA2YUA
                 }
                 else
                 {
-                    statustext = status.Antenna_Not_Connected ? "Not Connected" : "Short Circuit";
+                    statustext = status.Antenna_Not_Connected ? "DC Current Low" : "Short Circuit";
                 }
 
                 dataGridView1_Status_Info.Rows.Add(new object[] { "Antenna",
@@ -465,7 +528,7 @@ namespace EpsilWin_LA2YUA
             {
                 dataGridView1_Status_Info.Rows.Add(new object[] { "10 MHz/1PPS Lock",
                 status.Frequency_Output_Locked ? "10 MHz/1PPS in phase" :
-                "10 MHz/1PPS phase not synced",
+                "10 MHz/1PPS not cycle locked",
             status.Frequency_Output_Locked ? "OK" : "WARNING"});
             }
             else
@@ -474,7 +537,18 @@ namespace EpsilWin_LA2YUA
                 "Feature requires FW. V9r2",
             "N/A"});
             }
-            
+
+            GeoCoordinate gpscoords;
+
+            if (epsilondevice.GPS_Info.Positioning_Mode == EpsilonGPSInformation.GPSPositioningModes.Positioning_Mode_Manual &&
+                epsilondevice.GPS_Info.DataValid)
+            {
+                gpscoords = epsilondevice.GPS_Info.GPS_Position;
+            }
+            else
+            {
+                gpscoords = status.GPS_Position;
+            }
 
             // the position type is for some reason dependent on the GPS mode (in a different register!)
             // the GPS_Init state must be read before this to get correct results
@@ -483,7 +557,13 @@ namespace EpsilWin_LA2YUA
                 case EpsilonStatusMessageResponse.GPSReceptionMode.GPS_Reception_0D:
                     if (status.SatelliteList_Valid_Count > 1)
                     {
-                        if (epsilondevice.GPS_Info.Positioning_Mode == EpsilonGPSInformation.GPSPositioningModes.Positioning_Mode_Automatic)
+                        if (gpscoords.Latitude == 0 && gpscoords.Longitude == 0)
+                        {
+                            // if we have no position, this is always an error state
+                            statustext = "Survey Halted";
+                            statusbit = "ERROR";
+                        }
+                        else if (epsilondevice.GPS_Info.Positioning_Mode == EpsilonGPSInformation.GPSPositioningModes.Positioning_Mode_Automatic)
                         {
                             // after survey in auto this state will always be set (even for 4+ satellites tracked)
                             statustext = "Survey Complete (Auto)";
@@ -552,18 +632,6 @@ namespace EpsilWin_LA2YUA
                 statustext,
                 statusbit});
 
-            GeoCoordinate gpscoords;
-
-            if (epsilondevice.GPS_Info.Positioning_Mode == EpsilonGPSInformation.GPSPositioningModes.Positioning_Mode_Manual &&
-                epsilondevice.GPS_Info.DataValid)
-            {
-                gpscoords = epsilondevice.GPS_Info.GPS_Position;
-            }
-            else
-            {
-                gpscoords = status.GPS_Position;
-            }
-
                 dataGridView1_Status_Info.Rows.Add(new object[] { "GPS Lat",
                 String.Format("{0:N6}°", gpscoords.Latitude),
                 "N/A"});
@@ -582,16 +650,150 @@ namespace EpsilWin_LA2YUA
                 String.Format("{0} ns", status.Standard_Deviation_1PPS),
                 "N/A"});
 
-            foreach(SatelliteStatus s in status.SatelliteList)
+            dataGridView1_Status_Info.Rows.Add(new object[] { "Tracked Sats",
+                String.Format("{0} sats", status.SatelliteList_Valid_Count),
+                status.SatelliteList_Valid_Count > 3 ? "OK" : status.SatelliteList_Valid_Count >= 1 ? "WARNING" : "ERROR"});
+
+            dataGridView1_Status_Info.Rows.Add(new object[] { "Visible Sats",
+                String.Format("{0} sats", status.SatelliteList_Tracked_Count),
+                status.SatelliteList_Tracked_Count > 3 ? "OK" : status.SatelliteList_Tracked_Count >= 1 ? "WARNING" : "ERROR"});
+
+            foreach (SatelliteStatus s in status.SatelliteList)
             {
                 if (s.Valid)
                 {
                     dataGridView1_Status_Info.Rows.Add(new object[] { String.Format("Satellite Track Ch. {0}",
-                        status.SatelliteList.IndexOf(s)+1),
+                        s.ChannelIndex+1),
                     String.Format("PN {0}. SNR {1}", s.SatelliteNo.ToString().PadLeft(2, '0'), s.SNR.ToString().PadLeft(3, '0')),
                     s.Tracking ? "Tracked" : "Not Tracked"});
                 }
+
+                DataPoint satsnr = new DataPoint();
+                satsnr.XValue = DateTime.Now.ToOADate();
+
+                if (s.Valid)
+                {
+                    satsnr.YValues[0] = s.SNR;
+                }
+                else
+                {
+                    satsnr.YValues[0] = 0;
+                }
+
+                //chart2.Series[status.SatelliteList.IndexOf(s)].Points.Add(satsnr);
+                //chart2.Series[status.SatelliteList.IndexOf(s)].Name = String.Format("Ch {0} ({1})", status.SatelliteList.IndexOf(s)+1, s.SatelliteNo);
             }
+
+            chart2.SuspendLayout();
+            double timestamp = DateTime.UtcNow.ToOADate();
+            List<Series> updatedseries = new List<Series>();
+
+            foreach (SatelliteStatus s in status.SatelliteList)
+            {
+                DataPoint satsnr = new DataPoint();
+                satsnr.XValue = timestamp;
+
+                if (s.SatelliteNo != 0)
+                {
+                    if (s.SNR < 127)
+                    {
+                        satsnr.YValues[0] = s.SNR;
+                    }
+                    else
+                    {
+                        satsnr.YValues[0] = 0;
+                    }
+
+                    //ushort seriesindex = 0;
+
+                    Series currentseries;
+
+                    if (!SeenSatellites.TryGetValue(s.SatelliteNo, out currentseries))
+                    {
+                        currentseries = new Series();
+                        currentseries = chart2.Series.Add(String.Format("Sat no. {0}", s.SatelliteNo));
+
+                        currentseries.ChartType = SeriesChartType.FastLine;
+                        currentseries.XValueType = ChartValueType.DateTime;
+                        currentseries.BorderWidth = 3;
+
+                        
+                        SeenSatellites.Add(s.SatelliteNo, currentseries);
+                        SeenSatelliteSeries.Add(currentseries, s.SatelliteNo);
+
+
+
+                    }
+
+                    if (!s.Tracking)
+                    {
+                        currentseries.Name = String.Format("Dead ({0})", s.SatelliteNo);
+                        if (checkBox4.Checked)
+                        {
+                            currentseries.IsVisibleInLegend = true;
+                        }
+                        else
+                        {
+                            currentseries.IsVisibleInLegend = false;
+                        }
+                    }
+                    else if (s.SNR > 0 && s.SNR < 127)
+                    {
+                        currentseries.Name = String.Format("*Sat no. {0}", s.SatelliteNo);
+                        currentseries.IsVisibleInLegend = true;
+                    }
+                    else
+                    {
+                        currentseries.Name = String.Format("Sat no. {0}", s.SatelliteNo);
+                        currentseries.IsVisibleInLegend = true;
+                    }
+                    currentseries.Points.Add(satsnr);
+                    updatedseries.Add(currentseries);
+                }
+                else
+                {
+                    //satsnr.YValues[0] = 0;
+                }
+
+
+                //chart2.Series[s.ChannelIndex].Name = String.Format("Ch {0} ({1})", s.ChannelIndex + 1, s.SatelliteNo);
+            }
+
+            foreach (Series series in chart2.Series)
+            {
+                DataPoint satsnr = new DataPoint();
+                satsnr.XValue = timestamp;
+
+                int satellitenr = 0;
+
+                if (!updatedseries.Contains(series))
+                {
+                    if (SeenSatelliteSeries.TryGetValue(series, out satellitenr))
+                    {
+                        series.Name = String.Format("Dead ({0})", satellitenr);
+                        if (checkBox4.Checked)
+                        {
+                            series.IsVisibleInLegend = true;
+                        }
+                        else
+                        {
+                            series.IsVisibleInLegend = false;
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                    satsnr.YValues[0] = 0;
+                    series.Points.Add(satsnr);
+                }
+
+            }
+
+            // reorder chart
+            //chart2.Series.OrderBy(o => o.Name);
+
+            chart2.ResumeLayout();
 
 
             int rowscount = dataGridView1_Status_Info.Rows.Count;
@@ -617,8 +819,15 @@ namespace EpsilWin_LA2YUA
                 }
             }
 
+            chart1.Series[0].Points.Add(new DataPoint(timestamp, status.SatelliteList_Valid_Count));
+            chart1.Series[1].Points.Add(new DataPoint(timestamp, status.SatelliteList_Tracked_Count));
+
 
         }
+
+
+        Dictionary<int, Series> SeenSatellites = new Dictionary<int, Series>();
+        Dictionary<Series, int> SeenSatelliteSeries = new Dictionary<Series, int>();
 
 
         enum serialRXState
@@ -1135,7 +1344,18 @@ namespace EpsilWin_LA2YUA
                             sb.AppendFormat("Decode failed for {0} {1} (command may not be supported)\n",
                                     e.ReadWrite == EpsilonCommandAccessType.Read ? "Read" : "Write",
                                     e.FriendlyName);
-                                    //(int)e.Command_Index);
+                            //(int)e.Command_Index);
+                            string payload = String.Empty, rawpayload = String.Empty;
+
+                            payload = BitConverter.ToString(currentmessage.Payload.ToArray());
+                            rawpayload = BitConverter.ToString(currentmessage.RawData.ToArray());
+
+                            sb.AppendFormat("Failed payload info: {0} bytes, {1} raw bytes, 0x{2:x2} checkssum\nEscaped payload: {3}\nRaw payload: {4}", 
+                                currentmessage.PayloadLength,
+                                currentmessage.RawData.Count,
+                                currentmessage.checksum,
+                                payload,
+                                rawpayload);
                             break;
                         default: // unknown handler message
                             //Epsilon_Command_Info e2;
@@ -1353,6 +1573,12 @@ namespace EpsilWin_LA2YUA
         {
             label4.ForeColor = Color.LightGray;
             label5_Status_time.ForeColor = Color.LightGray;
+            richTextBox1_Serial_Log.AppendText(
+                String.Format("ToD timeout ({1} ms), last message at {0}\n", 
+                    DateTime.UtcNow.Subtract(new TimeSpan(0,0,0,1,200)).ToString("o"),
+                    timer1_Time_Timeout.Interval)
+                );
+            timer1_Time_Timeout.Stop();
         }
 
         private void button2_Version_read_Click(object sender, EventArgs e)
@@ -1932,6 +2158,52 @@ namespace EpsilWin_LA2YUA
             freq.Serialize(out List<byte> payload);
 
             Epsilon_Issue_Command(EpsilonCommandsIndex.Manual_Frequency_Write, payload);
+        }
+
+        private void chart2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
+
+        private void timer_Chart_Bury_Tick(object sender, EventArgs e)
+        {
+            foreach (Series s in chart2.Series)
+            {
+                if (s.Name.Contains("Dead"))
+                {
+                    s.IsVisibleInLegend = false;
+                }
+            }
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox c = (CheckBox)sender;
+            if (c.Checked)
+            {
+                foreach (Series s in chart2.Series)
+                {
+                    if (s.Name.Contains("Dead"))
+                    {
+                        s.IsVisibleInLegend = true;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Series s in chart2.Series)
+                {
+                    if (s.Name.Contains("Dead"))
+                    {
+                        s.IsVisibleInLegend = false;
+                    }
+                }
+            }
         }
     }
 }
